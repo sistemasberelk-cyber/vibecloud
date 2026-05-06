@@ -432,16 +432,16 @@
                 <td>${u.full_name || '-'}</td>
                 <td><span class="badge ${u.role === 'admin' ? 'admin' : ''}">${u.role}</span></td>
                 <td>
-            ${u.role !== 'admin' || u.id !== currentUserId ? `
-            <button onclick="deleteUser(${u.id})" style="color: red; border:none; background:none; cursor:pointer;">Eliminar</button>
-            ` : ''}
-            ${u.id !== currentUserId ? `
-            <button onclick="prefillReset(${u.id}, '${"${"}{u.username}"}')" style="margin-left:8px; border:none; background:none; color:#0f766e; cursor:pointer;">Reset clave</button>
-            ` : ''}
-        </td>
-    </tr>
-`).join('');
-}
+                    ${u.role !== 'admin' || u.id !== currentUserId ? `
+                    <button onclick="deleteUser(${u.id})" style="color: red; border:none; background:none; cursor:pointer;">Eliminar</button>
+                    ` : ''}
+                    ${u.id !== currentUserId ? `
+                    <button onclick="prefillReset(${u.id}, '${u.username}')" style="margin-left:8px; border:none; background:none; color:#0f766e; cursor:pointer;">Reset clave</button>
+                    ` : ''}
+                </td>
+            </tr>
+        `).join('');
+    }
 
     function openUserModal() {
         const form = document.querySelector('#user-modal form');
@@ -549,13 +549,12 @@
     // --- Settings Load ---
     document.addEventListener('DOMContentLoaded', () => {
         // Preload settings into form
-        const settings = {{ settings.model_dump_json() | safe
-    }};
-    if (settings.company_name) document.getElementById('s-company').value = settings.company_name;
-    if (settings.printer_name) document.getElementById('s-printer').value = settings.printer_name;
-    if (settings.label_width_mm) document.getElementById('s-label-w').value = settings.label_width_mm;
-    if (settings.label_height_mm) document.getElementById('s-label-h').value = settings.label_height_mm;
-    loadBackupFiles();
+        const settings = {{ settings_json | safe }};
+        if (settings.company_name) document.getElementById('s-company').value = settings.company_name;
+        if (settings.printer_name) document.getElementById('s-printer').value = settings.printer_name;
+        if (settings.label_width_mm) document.getElementById('s-label-w').value = settings.label_width_mm;
+        if (settings.label_height_mm) document.getElementById('s-label-h').value = settings.label_height_mm;
+        loadBackupFiles();
     });
 
     // --- Settings ---

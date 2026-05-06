@@ -48,7 +48,22 @@ def _templates():
 @router.get("/settings", response_class=HTMLResponse)
 def settings_page(request: Request, user: User = Depends(require_auth), settings: Settings = Depends(get_settings)):
     SettingsService.ensure_admin(user)
-    return _templates().TemplateResponse("settings.html", {"request": request, "user": user, "settings": settings, "active_page": "settings"})
+    # Safe serialization regardless of Pydantic version
+    try:
+        settings_json = settings.model_dump_json()
+    except AttributeError:
+        settings_json = settings.json()
+    
+    return _templates().TemplateResponse(
+        "settings.html", 
+        {
+            "request": request, 
+            "user": user, 
+            "settings": settings, 
+            "settings_json": settings_json,
+            "active_page": "settings"
+        }
+    )
 
 
 @router.get("/admin")
