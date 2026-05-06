@@ -624,7 +624,6 @@
         loadBackupFiles();
     }
 
-<<<<<<< HEAD
     async function restoreSystem(e) {
         e.preventDefault();
 
@@ -652,32 +651,12 @@
             alert("❌ Error crítico de conexión durante la restauración.");
             btn.disabled = false;
             btn.innerText = originalText;
-=======
-    async function restoreBackup(e) {
-        e.preventDefault();
-        const fileInput = document.getElementById('restore-file');
-        if (!fileInput.files.length) return;
-        const data = new FormData();
-        data.append('file', fileInput.files[0]);
-        const msg = document.getElementById('backup-msg');
-        msg.style.color = '#0f766e';
-        msg.textContent = 'Restaurando...';
-        try {
-            const res = await fetch('/api/admin/restore', { method: 'POST', body: data });
-            const payload = await res.json();
-            if (!res.ok || payload.error) {
-                msg.style.color = '#b91c1c';
-                msg.textContent = payload.error || payload.detail || 'Error al restaurar';
-            } else {
-                msg.style.color = '#0f766e';
-                msg.textContent = 'Restauración completa.';
-                loadBackupFiles();
-            }
-        } catch (err) {
-            msg.style.color = '#b91c1c';
-            msg.textContent = 'Error: ' + err;
->>>>>>> feature/wms-depositos
         }
+    }
+
+    // Map restoreBackup to the robust restoreSystem
+    async function restoreBackup(e) {
+        return restoreSystem(e);
     }
 </script>
 
