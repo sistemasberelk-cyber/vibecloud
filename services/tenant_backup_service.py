@@ -48,7 +48,7 @@ def export_tenant_snapshot(session: Session, tenant_id: int) -> dict[str, Any]:
     }
 
 
-def restore_tenant_snapshot(session: Session, tenant_id: int, data: dict[str, Any]) -> dict[str, Any]:
+def restore_tenant_snapshot(session: Session, tenant_id: int, data: dict[str, Any], current_user_id: int | None = None) -> dict[str, Any]:
     required_keys = {"products", "clients"}
     if not required_keys.issubset(data.keys()):
         raise HTTPException(400, detail="Invalid backup format: missing 'products' or 'clients'")
@@ -76,7 +76,11 @@ def restore_tenant_snapshot(session: Session, tenant_id: int, data: dict[str, An
     session.exec(delete(Payment).where(Payment.tenant_id == tenant_id))
     session.exec(delete(Product).where(Product.tenant_id == tenant_id))
     session.exec(delete(Client).where(Client.tenant_id == tenant_id))
-    session.exec(delete(User).where(User.tenant_id == tenant_id))
+    # Protect the current user from being deleted during restore
+    user_delete_query = delete(User).where(User.tenant_id == tenant_id)
+    if current_user_id is not None:
+        user_delete_query = user_delete_query.where(User.id != current_user_id)
+    session.exec(user_delete_query)
     session.exec(delete(Settings).where(Settings.tenant_id == tenant_id))
     session.commit()
 

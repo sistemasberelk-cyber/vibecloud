@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Configuración - NexPos{% endblock %}
+{% block title %}Configuración - NexPos (v2.5){% endblock %}
 
 {% block content %}
 <div class="glass-card">
+    <div style="background: #fee2e2; border: 1px solid #ef4444; padding: 12px; margin-bottom: 16px; border-radius: 8px; color: #b91c1c;">
+        <strong>MODO EDICIÓN ACTIVO:</strong> Si ves esto, los cambios se están aplicando.
+    </div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <h2>Configuración</h2>
-        <span class="badge admin">v2.4</span>
+        <span class="badge admin">v2.5</span>
     </div>
 
     <!-- Tabs -->
@@ -48,13 +51,21 @@
             <label style="display: block; margin-bottom: 8px; font-weight: 500;">Nombre de la Empresa</label>
             <input type="text" id="s-company" name="company_name" required value="" class="form-input">
 
-            <label style="display: block; margin-bottom: 8px; margin-top: 16px; font-weight: 500;">Impresora
-                Predeterminada (Windows)</label>
+            <div style="margin-top: 16px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary-color);">Estética del Sistema (Look & Feel)</label>
+                <select id="s-theme" name="ui_theme" class="form-input" style="margin-bottom: 0;">
+                    <option value="standard">Standard (Corporativo)</option>
+                    <option value="minimalist">Minimalista (Limpio & Moderno)</option>
+                </select>
+                <small style="color: #64748b;">Cambia la apariencia visual de toda la plataforma.</small>
+            </div>
+
+            <label style="display: block; margin-bottom: 8px; margin-top: 16px; font-weight: 500;">Impresora Predeterminada (Windows)</label>
             <input type="text" id="s-printer" name="printer_name" placeholder="Ej. EPSON TM-T20II" class="form-input">
 
-            <label style="display: block; margin-bottom: 8px; margin-top: 16px; font-weight: 500;">Logo de la Empresa
-                (opcional)</label>
+            <label style="display: block; margin-bottom: 8px; margin-top: 16px; font-weight: 500;">Logo de la Empresa (opcional)</label>
             <input type="file" id="s-logo" name="logo_file" accept="image/*" class="form-input" style="padding: 8px;">
+
 
             <h4 style="margin-top: 24px; margin-bottom: 12px; border-top: 1px solid #eee; padding-top: 16px;">
                 Configuración de Etiquetas</h4>
@@ -430,14 +441,12 @@
             <tr>
                 <td>${u.username}</td>
                 <td>${u.full_name || '-'}</td>
-                <td><span class="badge ${u.role === 'admin' ? 'admin' : ''}">${u.role}</span></td>
+                <td><span class="badge ${u.role === 'admin' || u.role === 'superadmin' ? 'admin' : ''}">${u.role}</span></td>
                 <td>
-                    ${u.role !== 'admin' || u.id !== currentUserId ? `
+                    ${u.id !== currentUserId ? `
                     <button onclick="deleteUser(${u.id})" style="color: red; border:none; background:none; cursor:pointer;">Eliminar</button>
                     ` : ''}
-                    ${u.id !== currentUserId ? `
                     <button onclick="prefillReset(${u.id}, '${u.username}')" style="margin-left:8px; border:none; background:none; color:#0f766e; cursor:pointer;">Reset clave</button>
-                    ` : ''}
                 </td>
             </tr>
         `).join('');
@@ -554,6 +563,7 @@
         if (settings.printer_name) document.getElementById('s-printer').value = settings.printer_name;
         if (settings.label_width_mm) document.getElementById('s-label-w').value = settings.label_width_mm;
         if (settings.label_height_mm) document.getElementById('s-label-h').value = settings.label_height_mm;
+        if (settings.ui_theme) document.getElementById('s-theme').value = settings.ui_theme;
         loadBackupFiles();
     });
 

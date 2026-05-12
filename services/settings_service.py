@@ -36,12 +36,13 @@ class SettingsService:
         "label_width_mm",
         "label_height_mm",
         "logo_file",
+        "ui_theme",
     }
     SUPPORTED_LOGO_CONTENT_TYPES = {"image/png", "image/jpeg", "image/webp", "image/gif", "image/svg+xml"}
 
     @staticmethod
     def ensure_admin(user: User) -> None:
-        if user.role != "admin":
+        if user.role not in ("admin", "superadmin"):
             raise HTTPException(status_code=403, detail="Admin role required")
 
     @staticmethod
@@ -84,6 +85,7 @@ class SettingsService:
         label_width_mm: Optional[int] = None,
         label_height_mm: Optional[int] = None,
         logo_file: Optional[UploadFile] = None,
+        ui_theme: Optional[str] = None,
     ) -> Settings:
         if company_name is not None:
             normalized_company_name = company_name.strip()
@@ -130,6 +132,11 @@ class SettingsService:
             with open(file_location, "wb") as buffer:
                 buffer.write(file_content)
             settings.logo_url = f"/{file_location}"
+
+        if ui_theme is not None:
+            if ui_theme not in ("standard", "minimalist"):
+                raise HTTPException(status_code=400, detail="Invalid ui_theme value")
+            settings.ui_theme = ui_theme
 
         session.add(settings)
         session.commit()

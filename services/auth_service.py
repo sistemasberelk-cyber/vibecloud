@@ -56,12 +56,9 @@ class AuthService:
             session.add(user)
             print(f"INFO: Created default user 'admin' (Tenant: {tenant.id})")
         else:
-            # EMERGENCIA: Resetear a clave conocida para restaurar acceso
-            # El usuario pidió "haz que pueda entrar". Se remueve la sincronización con env vars
-            # que causaba el bloqueo.
-            user.password_hash = AuthService.get_password_hash("Admin123!")
-            session.add(user)
-            print("INFO: Admin password emergency reset to Admin123!")
+            # Sincronización automática deshabilitada por solicitud.
+            # La clave se mantiene como esté en la BD.
+            pass
 
         # 2. Create or sync superadmin
         superadmin = session.exec(select(User).where(User.username == "superadmin")).first()

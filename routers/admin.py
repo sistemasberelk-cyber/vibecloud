@@ -90,6 +90,7 @@ async def update_settings(
     printer_name: Optional[str] = Form(None),
     label_width_mm: Optional[int] = Form(None),
     label_height_mm: Optional[int] = Form(None),
+    ui_theme: Optional[str] = Form(None),
     logo_file: Optional[UploadFile] = File(None),
     session: Session = Depends(get_session),
     user: User = Depends(require_auth),
@@ -107,6 +108,7 @@ async def update_settings(
         label_width_mm=label_width_mm,
         label_height_mm=label_height_mm,
         logo_file=logo_file,
+        ui_theme=ui_theme,
     )
     return {"status": "success"}
 
@@ -599,7 +601,7 @@ async def restore_system_backup(
         raw_content = await file.read()
         content = gzip.decompress(raw_content) if file.filename and file.filename.endswith(".gz") else raw_content
         data = json.loads(content)
-        return restore_tenant_snapshot(session, tenant_id, data)
+        return restore_tenant_snapshot(session, tenant_id, data, current_user_id=user.id)
     except HTTPException:
         raise
     except Exception as exc:

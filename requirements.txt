@@ -16,3 +16,6 @@ pandas
 openpyxl
 gspread
 oauth2client
+alembic
+pytest
+httpx

@@ -15,43 +15,7 @@ from services.bin_stock_service import BinStockService, StockServiceError
 
 router = APIRouter(prefix="/wms", tags=["WMS"])
 templates = Jinja2Templates(directory="templates")
-_wms_schema_checked = False
-
-
-def _ensure_wms_schema_compat(session: Session):
-    """
-    Compatibilidad para instalaciones viejas:
-    CREATE TABLE no agrega columnas nuevas en tablas ya existentes.
-    Esto evita 500 en páginas WMS si faltan columnas agregadas luego.
-    """
-    global _wms_schema_checked
-    if _wms_schema_checked:
-        return
-
-    stmts = [
-        "ALTER TABLE location ADD COLUMN IF NOT EXISTS tenant_id INTEGER",
-        "ALTER TABLE location ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE",
-        "ALTER TABLE location ADD COLUMN IF NOT EXISTS created_at TIMESTAMP",
-        "ALTER TABLE bin ADD COLUMN IF NOT EXISTS tenant_id INTEGER",
-        "ALTER TABLE bin ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE",
-        "ALTER TABLE bin ADD COLUMN IF NOT EXISTS max_capacity INTEGER",
-        "ALTER TABLE binstock ADD COLUMN IF NOT EXISTS tenant_id INTEGER",
-        "ALTER TABLE binstock ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP",
-        "ALTER TABLE stockmovement ADD COLUMN IF NOT EXISTS tenant_id INTEGER",
-        "ALTER TABLE stockmovement ADD COLUMN IF NOT EXISTS request_id VARCHAR",
-        "ALTER TABLE stockmovement ADD COLUMN IF NOT EXISTS user_id INTEGER",
-        "ALTER TABLE cashmovement ADD COLUMN IF NOT EXISTS reference_id INTEGER",
-        "ALTER TABLE cashmovement ADD COLUMN IF NOT EXISTS reference_type VARCHAR",
-        "ALTER TABLE cashmovement ADD COLUMN IF NOT EXISTS user_id INTEGER",
-    ]
-    for stmt in stmts:
-        try:
-            session.exec(text(stmt))
-            session.commit()
-        except Exception:
-            session.rollback()
-            continue
-    _wms_schema_checked = True
+# Removed manual schema checked logic as it's now handled by Alembic migrations.
 
 
 

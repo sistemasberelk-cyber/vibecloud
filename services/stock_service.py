@@ -48,15 +48,17 @@ class StockService:
             
             # --- Credit Limit Check ---
             # If sale is not fully paid (Current Account), check limit
-            # Calculate what part is debt
-            # Determine Price: Always prefer Bulk Price if available
-            unit_price = product.price_bulk if (product.price_bulk and product.price_bulk > 0) else product.price
+            # Determine Price: Use bulk price only when qty meets cant_bulto threshold
+            if product.price_bulk and product.price_bulk > 0 and product.cant_bulto and qty >= product.cant_bulto:
+                unit_price = product.price_bulk
+            else:
+                unit_price = product.price
 
             # Decrement Stock
             product.stock_quantity -= qty
             session.add(product)
 
-            # Create Sale Item
+            # Create Sale Item (with cost snapshot for profitability)
             line_total = unit_price * qty
             total_sale += line_total
             
@@ -65,7 +67,8 @@ class StockService:
                 product_name=product.name,
                 quantity=qty,
                 unit_price=unit_price,
-                total=line_total
+                total=line_total,
+                cost_price_at_sale=product.cost_price or 0.0
             )
             sale.items.append(sale_item)
             

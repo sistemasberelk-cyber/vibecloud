@@ -26,6 +26,7 @@ class Settings(SQLModel, table=True):
     printer_name: Optional[str] = Field(default=None)
     label_width_mm: int = Field(default=60)
     label_height_mm: int = Field(default=40)
+    ui_theme: str = Field(default="standard") # standard, minimalist
 
 # --- Tax Model ---
 class Tax(SQLModel, table=True):
@@ -52,6 +53,7 @@ class Client(SQLModel, table=True):
     iva_category: Optional[str] = None # Resp Inscripto, Monotributo, etc
     transport_name: Optional[str] = None
     transport_address: Optional[str] = None
+    is_deleted: bool = Field(default=False)
     
     sales: List["Sale"] = Relationship(back_populates="client")
     payments: List["Payment"] = Relationship(back_populates="client")
@@ -94,6 +96,7 @@ class Product(SQLModel, table=True):
     numeracion: Optional[str] = None # Size/Numbering
     
     curve_quantity: int = Field(default=1) # Quantity in the curve/pack
+    is_deleted: bool = Field(default=False)
 
 # --- Sale Models (Header & Detail) ---
 class Sale(SQLModel, table=True):
@@ -128,6 +131,7 @@ class SaleItem(SQLModel, table=True):
     quantity: int
     unit_price: float
     total: float
+    cost_price_at_sale: float = Field(default=0.0)  # Costo al momento de venta (para rentabilidad)
     
     sale: Optional[Sale] = Relationship(back_populates="items")
 
