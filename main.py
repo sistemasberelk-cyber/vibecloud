@@ -62,6 +62,8 @@ def ensure_schema_compatibility(session: Session):
         "ALTER TABLE product ADD COLUMN IF NOT EXISTS curve_quantity INTEGER DEFAULT 1",
         "ALTER TABLE product ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
         "ALTER TABLE product ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS item_number VARCHAR",
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS image_url VARCHAR",
         "ALTER TABLE supplier ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
         "ALTER TABLE supplier ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
         "ALTER TABLE \"user\" ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
@@ -70,6 +72,9 @@ def ensure_schema_compatibility(session: Session):
         "ALTER TABLE purchase ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
         "ALTER TABLE location ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
         "ALTER TABLE location ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
+        "ALTER TABLE client ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
+        "ALTER TABLE client ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
+        "ALTER TABLE client ADD COLUMN IF NOT EXISTS credit_limit FLOAT",
         "ALTER TABLE client ADD COLUMN IF NOT EXISTS razon_social VARCHAR",
         "ALTER TABLE client ADD COLUMN IF NOT EXISTS cuit VARCHAR",
         "ALTER TABLE client ADD COLUMN IF NOT EXISTS iva_category VARCHAR",
@@ -157,6 +162,81 @@ app.include_router(wms_router)
 @app.head("/health")
 def health_check():
     return {"status": "ok"}
+
+
+@app.get("/fix-db")
+def fix_db(session: Session = Depends(get_session)):
+    results = []
+    stmts = [
+        "ALTER TABLE bin ADD COLUMN IF NOT EXISTS max_capacity INTEGER",
+        "ALTER TABLE bin ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
+        "ALTER TABLE bin ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
+        "ALTER TABLE binstock ADD COLUMN IF NOT EXISTS tenant_id INTEGER",
+        "ALTER TABLE binstock ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP",
+        "ALTER TABLE stockmovement ADD COLUMN IF NOT EXISTS tenant_id INTEGER",
+        "ALTER TABLE stockmovement ADD COLUMN IF NOT EXISTS request_id VARCHAR",
+        "ALTER TABLE stockmovement ADD COLUMN IF NOT EXISTS user_id INTEGER",
+        "ALTER TABLE cashmovement ADD COLUMN IF NOT EXISTS reference_id INTEGER",
+        "ALTER TABLE cashmovement ADD COLUMN IF NOT EXISTS reference_type VARCHAR",
+        "ALTER TABLE cashmovement ADD COLUMN IF NOT EXISTS user_id INTEGER",
+        "ALTER TABLE cashmovement ADD COLUMN IF NOT EXISTS sale_id INTEGER",
+        "ALTER TABLE cashmovement ADD COLUMN IF NOT EXISTS purchase_id INTEGER",
+        "ALTER TABLE payment ADD COLUMN IF NOT EXISTS receivable_id INTEGER",
+        "ALTER TABLE payment ADD COLUMN IF NOT EXISTS method VARCHAR DEFAULT 'cash'",
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS price_bulk FLOAT",
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS price_retail FLOAT",
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS cant_bulto INTEGER",
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS numeracion VARCHAR",
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS curve_quantity INTEGER DEFAULT 1",
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS item_number VARCHAR",
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS image_url VARCHAR",
+        "ALTER TABLE supplier ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
+        "ALTER TABLE supplier ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
+        "ALTER TABLE \"user\" ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
+        "ALTER TABLE \"user\" ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
+        "ALTER TABLE purchase ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
+        "ALTER TABLE purchase ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
+        "ALTER TABLE location ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
+        "ALTER TABLE location ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
+        "ALTER TABLE client ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
+        "ALTER TABLE client ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
+        "ALTER TABLE client ADD COLUMN IF NOT EXISTS credit_limit FLOAT",
+        "ALTER TABLE client ADD COLUMN IF NOT EXISTS razon_social VARCHAR",
+        "ALTER TABLE client ADD COLUMN IF NOT EXISTS cuit VARCHAR",
+        "ALTER TABLE client ADD COLUMN IF NOT EXISTS iva_category VARCHAR",
+        "ALTER TABLE client ADD COLUMN IF NOT EXISTS transport_name VARCHAR",
+        "ALTER TABLE client ADD COLUMN IF NOT EXISTS transport_address VARCHAR",
+        "ALTER TABLE settings ADD COLUMN IF NOT EXISTS ui_theme VARCHAR DEFAULT 'default'",
+        "ALTER TABLE aicredential ADD COLUMN IF NOT EXISTS api_key_enc VARCHAR",
+        "ALTER TABLE businessconfig ADD COLUMN IF NOT EXISTS openai_api_key_enc VARCHAR",
+        "ALTER TABLE businessconfig ADD COLUMN IF NOT EXISTS deepseek_api_key_enc VARCHAR",
+        "ALTER TABLE businessconfig ADD COLUMN IF NOT EXISTS elevenlabs_api_key_enc VARCHAR",
+    ]
+    for stmt in stmts:
+        try:
+            session.exec(text(stmt))
+            session.commit()
+            results.append({"stmt": stmt, "status": "success"})
+        except Exception as e:
+            session.rollback()
+            results.append({"stmt": stmt, "status": "error", "message": str(e)})
+            
+    # Try Alembic manually
+    try:
+        from alembic import command
+        from alembic.config import Config
+        alembic_cfg = Config("alembic.ini")
+        db_url = os.getenv("DATABASE_URL")
+        if db_url:
+            alembic_cfg.set_main_option("sqlalchemy.url", db_url)
+        command.upgrade(alembic_cfg, "head")
+        results.append({"stmt": "alembic upgrade head", "status": "success"})
+    except Exception as e:
+        results.append({"stmt": "alembic upgrade head", "status": "error", "message": str(e)})
+        
+    return {"results": results}
 
 
 @app.get("/", response_class=HTMLResponse)
