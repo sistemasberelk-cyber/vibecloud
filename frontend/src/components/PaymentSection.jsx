@@ -1,0 +1,216 @@
+'use client';
+import React, { useState, useEffect } from 'react';
+
+export default function PaymentSection({ cartItems, onProcessSale, processing }) {
+  const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [amountPaid, setAmountPaid] = useState('');
+  const [splitCash, setSplitCash] = useState('');
+  const [splitTransfer, setSplitTransfer] = useState('');
+  const [clientId, setClientId] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const calculateItemPrice = (item) => {
+    return item.price_type === 'bulk'
+      ? (item.product.price_bulk ?? item.product.price)
+      : (item.product.price_retail ?? item.product.price);
+  };
+
+  const total = cartItems.reduce((sum, item) => {
+    return sum + (calculateItemPrice(item) * item.quantity);
+  }, 0);
+
+  // Sync split fields when payment method changes or total changes
+  useEffect(() => {
+    if (paymentMethod === 'mixed') {
+      const half = (total / 2).toFixed(2);
+      setSplitCash(half);
+      setSplitTransfer(half);
+    } else {
+      setSplitCash('');
+      setSplitTransfer('');
+    }
+    setAmountPaid(total.toFixed(2));
+  }, [paymentMethod, total]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setErrorMsg('');
+
+    if (cartItems.length === 0) {
+      setErrorMsg('El carrito está vacío.');
+      return;
+    }
+
+    const payload = {
+      payment_method: paymentMethod,
+      client_id: clientId ? parseInt(clientId) : null,
+      amount_paid: amountPaid ? parseFloat(amountPaid) : total,
+      split_cash: paymentMethod === 'mixed' && splitCash ? parseFloat(splitCash) : null,
+      split_transfer: paymentMethod === 'mixed' && splitTransfer ? parseFloat(splitTransfer) : null
+    };
+
+    // Validation for mixed payment
+    if (paymentMethod === 'mixed') {
+      const sum = (payload.split_cash || 0) + (payload.split_transfer || 0);
+      if (Math.abs(sum - total) > 0.05) {
+        setErrorMsg(`Los montos mixtos ($${sum.toFixed(2)}) deben coincidir con el total ($${total.toFixed(2)}).`);
+        return;
+      }
+    }
+
+    onProcessSale(payload);
+  };
+
+  return (
+    <div className="sdui-payment" style={{
+      background: 'rgba(255, 255, 255, 0.02)',
+      border: '1px solid rgba(255, 255, 255, 0.05)',
+      borderRadius: 'var(--border-radius)',
+      padding: '1.2rem',
+      color: '#fff',
+      fontFamily: 'var(--font-family)'
+    }}>
+      <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.2rem', fontWeight: '600', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem' }}>
+        Finalizar Transacción
+      </h2>
+
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+        {/* Client ID */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <label style={{ fontSize: '0.8rem', opacity: 0.8 }}>ID Cliente (Opcional):</label>
+          <input
+            type="number"
+            placeholder="Ej: 1"
+            value={clientId}
+            onChange={(e) => setClientId(e.target.value)}
+            style={{
+              background: 'rgba(0,0,0,0.2)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              padding: '0.5rem',
+              borderRadius: 'calc(var(--border-radius) / 2)',
+              color: '#fff',
+              outline: 'none'
+            }}
+          />
+        </div>
+
+        {/* Payment Method */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <label style={{ fontSize: '0.8rem', opacity: 0.8 }}>Método de Pago:</label>
+          <select
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value)}
+            style={{
+              background: 'rgba(0,0,0,0.3)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              padding: '0.5rem',
+              borderRadius: 'calc(var(--border-radius) / 2)',
+              color: '#fff',
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="cash">Efectivo</option>
+            <option value="transfer">Transferencia</option>
+            <option value="mixed">Pago Mixto (Efectivo + Transf.)</option>
+            <option value="credit">Cuenta Corriente (Deuda)</option>
+          </select>
+        </div>
+
+        {/* Mixed details */}
+        {paymentMethod === 'mixed' && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', background: 'rgba(0,0,0,0.1)', padding: '0.75rem', borderRadius: '4px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <label style={{ fontSize: '0.75rem', opacity: 0.8 }}>Efectivo:</label>
+              <input
+                type="number"
+                step="0.01"
+                value={splitCash}
+                onChange={(e) => setSplitCash(e.target.value)}
+                style={{
+                  background: 'rgba(0,0,0,0.2)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  padding: '0.4rem',
+                  borderRadius: '4px',
+                  color: '#fff',
+                  fontSize: '0.85rem'
+                }}
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <label style={{ fontSize: '0.75rem', opacity: 0.8 }}>Transferencia:</label>
+              <input
+                type="number"
+                step="0.01"
+                value={splitTransfer}
+                onChange={(e) => setSplitTransfer(e.target.value)}
+                style={{
+                  background: 'rgba(0,0,0,0.2)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  padding: '0.4rem',
+                  borderRadius: '4px',
+                  color: '#fff',
+                  fontSize: '0.85rem'
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Amount Paid */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <label style={{ fontSize: '0.8rem', opacity: 0.8 }}>Monto Cobrado:</label>
+          <input
+            type="number"
+            step="0.01"
+            value={amountPaid}
+            onChange={(e) => setAmountPaid(e.target.value)}
+            disabled={paymentMethod === 'credit'}
+            style={{
+              background: 'rgba(0,0,0,0.2)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              padding: '0.5rem',
+              borderRadius: 'calc(var(--border-radius) / 2)',
+              color: '#fff',
+              outline: 'none',
+              opacity: paymentMethod === 'credit' ? 0.5 : 1
+            }}
+          />
+        </div>
+
+        {errorMsg && (
+          <div style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '0.25rem', fontWeight: '500' }}>
+            ⚠️ {errorMsg}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={processing || cartItems.length === 0}
+          style={{
+            background: 'var(--secondary-color)',
+            color: '#fff',
+            border: 'none',
+            padding: '0.85rem',
+            borderRadius: 'calc(var(--border-radius) / 2)',
+            cursor: (processing || cartItems.length === 0) ? 'not-allowed' : 'pointer',
+            fontWeight: '700',
+            fontSize: '1rem',
+            fontFamily: 'var(--font-family)',
+            marginTop: '0.5rem',
+            transition: 'opacity 0.2s',
+            opacity: (processing || cartItems.length === 0) ? 0.6 : 1
+          }}
+          onMouseEnter={(e) => {
+            if (!processing && cartItems.length > 0) e.target.style.opacity = 0.9;
+          }}
+          onMouseLeave={(e) => {
+            if (!processing && cartItems.length > 0) e.target.style.opacity = 1;
+          }}
+        >
+          {processing ? 'Procesando Venta...' : 'Cerrar Venta'}
+        </button>
+      </form>
+    </div>
+  );
+}
