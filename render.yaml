@@ -28,6 +28,6 @@ services:
     startCommand: npm run start
     envVars:
       - key: NODE_VERSION
-        value: 20.0.0
+        value: 20.11.0
       - key: NEXT_PUBLIC_API_URL
         value: https://vibecloud-backend.onrender.com/api/v1 # Update this if the backend URL differs
