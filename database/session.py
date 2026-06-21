@@ -48,7 +48,8 @@ if not DATABASE_URL:
     DATABASE_URL = "sqlite:///./test.db" # Fallback for local testing if env missing
 
 # check_same_thread=False is needed only for SQLite
-connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+# Add connect_timeout=10 to postgresql connection args to prevent hanging indefinitely
+connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {"connect_timeout": 10}
 
 # Verify if we need sslmode=require for postgres (usually needed for hosted DBs)
 if "postgresql" in DATABASE_URL and "sslmode" not in DATABASE_URL:

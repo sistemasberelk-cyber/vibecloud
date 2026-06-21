@@ -68,10 +68,15 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    # Add connection timeout to prevent hanging indefinitely on unreachable databases
+    db_url = config.get_main_option("sqlalchemy.url")
+    connect_args = {"connect_timeout": 10} if db_url and "sqlite" not in db_url else {}
+
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        connect_args=connect_args,
     )
 
     with connectable.connect() as connection:
