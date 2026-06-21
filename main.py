@@ -35,7 +35,11 @@ logger = logging.getLogger(__name__)
 from sqlalchemy import text
 
 def ensure_schema_compatibility(session: Session):
-    """Hardening: Ensure critical columns exist even if Alembic fails."""
+    """
+    DEPRECATED: This block is deprecated. All future schema changes must
+    go through Alembic migrations (alembic revision --autogenerate).
+    Do not add new columns or modify constraints here.
+    """
     stmts = [
         "ALTER TABLE bin ADD COLUMN IF NOT EXISTS max_capacity INTEGER",
         "ALTER TABLE bin ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
@@ -92,8 +96,10 @@ def ensure_schema_compatibility(session: Session):
             session.commit()
         except Exception as e:
             session.rollback()
-            # Silently fail for columns that already exist or other dialect issues
-            pass
+            err_msg = str(e).lower()
+            is_duplicate = "duplicate" in err_msg or "already exists" in err_msg
+            if not is_duplicate:
+                logger.warning(f"Schema compatibility check warning for stmt '{stmt}': {e}")
 
 templates = CompatTemplates(directory="templates")
 
@@ -165,7 +171,10 @@ def health_check():
 
 
 @app.get("/fix-db")
-def fix_db(session: Session = Depends(get_session)):
+def fix_db(session: Session = Depends(get_session), user: User = Depends(require_auth)):
+    if user.role != "superadmin":
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Forbidden: Requires superadmin role.")
     results = []
     stmts = [
         "ALTER TABLE bin ADD COLUMN IF NOT EXISTS max_capacity INTEGER",
@@ -245,13 +254,18 @@ def get_dashboard(request: Request, user: User = Depends(require_auth), settings
     if user.role == "superadmin":
         return RedirectResponse("/tenants", status_code=302)
     total_products = session.exec(select(func.count(Product.id)).where(Product.tenant_id == tenant_id)).one()
-    # To fix crash, calculate low stock in python
-    low_stock = 0
-    from services.stock_service import StockService
-    stock_service = StockService()
-    for p in session.exec(select(Product).where(Product.tenant_id == tenant_id)).all():
-        if stock_service.get_total_stock(session, p.id, tenant_id) < p.min_stock_level:
-            low_stock += 1
+    from database.models import BinStock
+    from sqlalchemy.sql.functions import coalesce
+
+    subquery = (
+        select(Product.id)
+        .join(BinStock, BinStock.product_id == Product.id, isouter=True)
+        .where(Product.tenant_id == tenant_id, Product.is_deleted == False)
+        .group_by(Product.id, Product.min_stock_level)
+        .having(coalesce(func.sum(BinStock.quantity), 0) < Product.min_stock_level)
+        .subquery()
+    )
+    low_stock = session.exec(select(func.count()).select_from(subquery)).one()
             
     recent_sales = session.exec(select(Sale).where(Sale.tenant_id == tenant_id, Sale.is_closed == False).order_by(Sale.timestamp.desc()).limit(5)).all()
     today_start = datetime.combine(date.today(), datetime.min.time())
