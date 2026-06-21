@@ -255,3 +255,64 @@ sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in
 2026-06-20 23:47:26,203 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
 2026-06-20 23:47:26,212 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/logout "HTTP/1.1 200 OK"
 2026-06-20 23:47:26,217 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/refresh "HTTP/1.1 401 Unauthorized"
+2026-06-20 23:53:06,974 [INFO] root: Logging system initialized.
+2026-06-20 23:53:07,314 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/products "HTTP/1.1 422 Unprocessable Entity"
+2026-06-20 23:53:07,405 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/products "HTTP/1.1 200 OK"
+2026-06-20 23:53:07,442 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/products "HTTP/1.1 200 OK"
+2026-06-20 23:53:07,449 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/products/1 "HTTP/1.1 404 Not Found"
+2026-06-20 23:53:07,633 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-06-20 23:53:07,633 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-06-20 23:53:07,634 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-06-20 23:53:07,634 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-06-20 23:53:07,634 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-06-20 23:53:07,634 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-06-20 23:53:07,839 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+2026-06-20 23:53:07,860 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 401 Unauthorized"
+2026-06-20 23:53:08,037 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+2026-06-20 23:53:08,045 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/refresh "HTTP/1.1 200 OK"
+2026-06-20 23:53:08,226 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+2026-06-20 23:53:08,233 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/logout "HTTP/1.1 200 OK"
+2026-06-20 23:53:08,237 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/refresh "HTTP/1.1 401 Unauthorized"
+2026-06-21 00:08:55,939 [INFO] root: Logging system initialized.
+2026-06-21 00:08:56,390 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/products "HTTP/1.1 422 Unprocessable Entity"
+2026-06-21 00:08:56,484 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/products "HTTP/1.1 200 OK"
+2026-06-21 00:08:56,517 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/products "HTTP/1.1 200 OK"
+2026-06-21 00:08:56,524 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/products/1 "HTTP/1.1 404 Not Found"
+2026-06-21 00:08:56,814 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-06-21 00:08:56,814 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-06-21 00:08:56,814 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-06-21 00:08:56,814 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-06-21 00:08:56,815 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-06-21 00:08:56,815 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-06-21 00:08:57,167 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+2026-06-21 00:08:57,211 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 401 Unauthorized"
+2026-06-21 00:08:57,461 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+2026-06-21 00:08:57,474 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/refresh "HTTP/1.1 200 OK"
+2026-06-21 00:08:57,743 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+2026-06-21 00:08:57,750 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/logout "HTTP/1.1 200 OK"
+2026-06-21 00:08:57,756 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/refresh "HTTP/1.1 401 Unauthorized"
+2026-06-21 08:51:40,141 [INFO] root: Logging system initialized.
+2026-06-21 08:51:40,703 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/products "HTTP/1.1 422 Unprocessable Entity"
+2026-06-21 08:51:40,799 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/products "HTTP/1.1 200 OK"
+2026-06-21 08:51:40,840 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/products "HTTP/1.1 200 OK"
+2026-06-21 08:51:40,846 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/products/1 "HTTP/1.1 404 Not Found"
+2026-06-21 08:51:40,997 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-06-21 08:51:40,997 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-06-21 08:51:40,997 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-06-21 08:51:40,997 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-06-21 08:51:40,998 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-06-21 08:51:40,998 [INFO] alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-06-21 08:51:41,281 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+2026-06-21 08:51:41,323 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 401 Unauthorized"
+2026-06-21 08:51:41,516 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+2026-06-21 08:51:41,526 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/refresh "HTTP/1.1 200 OK"
+2026-06-21 08:51:41,720 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+2026-06-21 08:51:41,727 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/logout "HTTP/1.1 200 OK"
+2026-06-21 08:51:41,731 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/auth/refresh "HTTP/1.1 401 Unauthorized"
+2026-06-21 08:51:41,835 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/ui-config/pos "HTTP/1.1 422 Unprocessable Entity"
+2026-06-21 08:51:41,914 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/ui-config/pos "HTTP/1.1 200 OK"
+2026-06-21 08:51:41,952 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/ui-config/pos "HTTP/1.1 200 OK"
+2026-06-21 08:51:41,979 [INFO] httpx: HTTP Request: PUT http://testserver/api/v1/ui-config/pos "HTTP/1.1 403 Forbidden"
+2026-06-21 08:51:41,989 [INFO] httpx: HTTP Request: PUT http://testserver/api/v1/ui-config/pos "HTTP/1.1 200 OK"
+2026-06-21 08:51:42,026 [INFO] httpx: HTTP Request: PUT http://testserver/api/v1/ui-config/dashboard "HTTP/1.1 200 OK"
+2026-06-21 08:51:42,033 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/ui-config/dashboard "HTTP/1.1 200 OK"

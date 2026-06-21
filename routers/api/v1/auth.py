@@ -21,6 +21,7 @@ class RefreshRequest(BaseModel):
 
 class RefreshResponse(BaseModel):
     access_token: str
+    refresh_token: str
 
 class LogoutRequest(BaseModel):
     refresh_token: str
@@ -60,7 +61,7 @@ def login(req: LoginRequest, session: Session = Depends(get_session)):
 
 @router.post("/auth/refresh", response_model=RefreshResponse)
 def refresh(req: RefreshRequest, session: Session = Depends(get_session)):
-    from services.jwt_service import hash_refresh_token, create_access_token
+    from services.jwt_service import hash_refresh_token, create_access_token, create_refresh_token
     r_hash = hash_refresh_token(req.refresh_token)
     db_token = session.exec(select(RefreshToken).where(RefreshToken.token_hash == r_hash)).first()
     if not db_token or db_token.revoked_at is not None:
@@ -88,8 +89,26 @@ def refresh(req: RefreshRequest, session: Session = Depends(get_session)):
             detail="Usuario inactivo o no encontrado"
         )
     
+    # 1. Revoke the old refresh token
+    db_token.revoked_at = now
+    session.add(db_token)
+    
+    # 2. Generate new tokens
     access = create_access_token(user.id, user.tenant_id, user.role)
-    return RefreshResponse(access_token=access)
+    raw_refresh = create_refresh_token()
+    refresh_hash = hash_refresh_token(raw_refresh)
+    
+    new_expires = datetime.now(timezone.utc) + timedelta(days=7) if expires.tzinfo is not None else datetime.now() + timedelta(days=7)
+    new_db_token = RefreshToken(
+        user_id=user.id,
+        tenant_id=user.tenant_id,
+        token_hash=refresh_hash,
+        expires_at=new_expires
+    )
+    session.add(new_db_token)
+    session.commit()
+    
+    return RefreshResponse(access_token=access, refresh_token=raw_refresh)
 
 @router.post("/auth/logout")
 def logout(req: LogoutRequest, session: Session = Depends(get_session)):

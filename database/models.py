@@ -579,3 +579,21 @@ class RefreshToken(SQLModel, table=True):
     expires_at: datetime
     created_at: datetime = Field(default_factory=_utcnow)
     revoked_at: Optional[datetime] = None
+
+
+# ===========================================================================
+# UI CONFIG (FASE 2: GESTOR DE UI)
+# ===========================================================================
+
+class UIConfig(SQLModel, table=True):
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "page_name", name="uq_uiconfig_tenant_page"),
+    )
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    tenant_id: int = Field(foreign_key="tenant.id", index=True)
+    page_name: str = Field(index=True)  # "pos", "dashboard", "storefront_home"
+    layout_json: str
+    theme_json: str
+    updated_at: datetime = Field(default_factory=_utcnow)
+
