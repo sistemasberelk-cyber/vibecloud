@@ -1,8 +1,9 @@
 services:
+  # 1. Backend Service (FastAPI)
   - type: web
-    name: berelk-backend-nexpos
+    name: vibecloud-backend
     runtime: python
-    repo: https://github.com/sistemasberelk-cyber/BERELK
+    repo: https://github.com/sistemasberelk-cyber/vibecloud
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
@@ -10,10 +11,23 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.0
       - key: DATABASE_URL
-        sync: false # User must provide this manually in Render Dashboard from Supabase
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_KEY
-        sync: false
+        sync: false # Must be provided by user (e.g. Supabase postgres connection string)
       - key: SECRET_KEY
-        sync: false
+        sync: false # Key used for signing session JWT tokens
+      - key: GEMINI_API_KEY
+        sync: false # API Key for Server-Driven UI aesthetics generation
+
+  # 2. Frontend Service (Next.js Adaptive UI)
+  - type: web
+    name: vibecloud-frontend
+    runtime: node
+    repo: https://github.com/sistemasberelk-cyber/vibecloud
+    plan: free
+    rootDirectory: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.0.0
+      - key: NEXT_PUBLIC_API_URL
+        value: https://vibecloud-backend.onrender.com/api/v1 # Update this if the backend URL differs
