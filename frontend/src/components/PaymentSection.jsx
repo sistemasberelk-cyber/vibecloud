@@ -63,11 +63,11 @@ export default function PaymentSection({ cartItems, onProcessSale, processing })
 
   return (
     <div className="sdui-payment" style={{
-      background: 'rgba(255, 255, 255, 0.02)',
+      background: 'var(--card-bg, rgba(255, 255, 255, 0.02))',
       border: '1px solid rgba(255, 255, 255, 0.05)',
       borderRadius: 'var(--border-radius)',
       padding: '1.2rem',
-      color: '#fff',
+      color: 'var(--text-color, #fff)',
       fontFamily: 'var(--font-family)'
     }}>
       <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.2rem', fontWeight: '600', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem' }}>
@@ -84,11 +84,11 @@ export default function PaymentSection({ cartItems, onProcessSale, processing })
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
             style={{
-              background: 'rgba(0,0,0,0.2)',
+              background: 'var(--card-bg, rgba(0, 0, 0, 0.2))',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               padding: '0.5rem',
               borderRadius: 'calc(var(--border-radius) / 2)',
-              color: '#fff',
+              color: 'var(--text-color, #fff)',
               outline: 'none'
             }}
           />
@@ -101,11 +101,11 @@ export default function PaymentSection({ cartItems, onProcessSale, processing })
             value={paymentMethod}
             onChange={(e) => setPaymentMethod(e.target.value)}
             style={{
-              background: 'rgba(0,0,0,0.3)',
+              background: 'var(--card-bg, rgba(0, 0, 0, 0.3))',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               padding: '0.5rem',
               borderRadius: 'calc(var(--border-radius) / 2)',
-              color: '#fff',
+              color: 'var(--text-color, #fff)',
               outline: 'none',
               cursor: 'pointer'
             }}
@@ -119,7 +119,7 @@ export default function PaymentSection({ cartItems, onProcessSale, processing })
 
         {/* Mixed details */}
         {paymentMethod === 'mixed' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', background: 'rgba(0,0,0,0.1)', padding: '0.75rem', borderRadius: '4px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', background: 'var(--card-bg, rgba(0, 0, 0, 0.1))', padding: '0.75rem', borderRadius: '4px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
               <label style={{ fontSize: '0.75rem', opacity: 0.8 }}>Efectivo:</label>
               <input
@@ -128,11 +128,11 @@ export default function PaymentSection({ cartItems, onProcessSale, processing })
                 value={splitCash}
                 onChange={(e) => setSplitCash(e.target.value)}
                 style={{
-                  background: 'rgba(0,0,0,0.2)',
+                  background: 'var(--card-bg, rgba(0, 0, 0, 0.2))',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
                   padding: '0.4rem',
                   borderRadius: '4px',
-                  color: '#fff',
+                  color: 'var(--text-color, #fff)',
                   fontSize: '0.85rem'
                 }}
               />
@@ -145,11 +145,11 @@ export default function PaymentSection({ cartItems, onProcessSale, processing })
                 value={splitTransfer}
                 onChange={(e) => setSplitTransfer(e.target.value)}
                 style={{
-                  background: 'rgba(0,0,0,0.2)',
+                  background: 'var(--card-bg, rgba(0, 0, 0, 0.2))',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
                   padding: '0.4rem',
                   borderRadius: '4px',
-                  color: '#fff',
+                  color: 'var(--text-color, #fff)',
                   fontSize: '0.85rem'
                 }}
               />
@@ -167,11 +167,11 @@ export default function PaymentSection({ cartItems, onProcessSale, processing })
             onChange={(e) => setAmountPaid(e.target.value)}
             disabled={paymentMethod === 'credit'}
             style={{
-              background: 'rgba(0,0,0,0.2)',
+              background: 'var(--card-bg, rgba(0, 0, 0, 0.2))',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               padding: '0.5rem',
               borderRadius: 'calc(var(--border-radius) / 2)',
-              color: '#fff',
+              color: 'var(--text-color, #fff)',
               outline: 'none',
               opacity: paymentMethod === 'credit' ? 0.5 : 1
             }}
@@ -189,7 +189,7 @@ export default function PaymentSection({ cartItems, onProcessSale, processing })
           disabled={processing || cartItems.length === 0}
           style={{
             background: 'var(--secondary-color)',
-            color: '#fff',
+            color: 'var(--text-color, #fff)',
             border: 'none',
             padding: '0.85rem',
             borderRadius: 'calc(var(--border-radius) / 2)',

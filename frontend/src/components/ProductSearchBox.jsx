@@ -11,7 +11,7 @@ export default function ProductSearchBox({ value, onChange, onSearch }) {
   return (
     <div className="sdui-searchbox" style={{
       padding: '1rem',
-      background: 'rgba(255, 255, 255, 0.03)',
+      background: 'var(--card-bg, rgba(255, 255, 255, 0.03))',
       backdropFilter: 'blur(5px)',
       border: '1px solid rgba(255, 255, 255, 0.05)',
       borderRadius: 'var(--border-radius)',
@@ -27,24 +27,24 @@ export default function ProductSearchBox({ value, onChange, onSearch }) {
         onKeyDown={handleKeyDown}
         style={{
           flex: 1,
-          background: 'rgba(0, 0, 0, 0.2)',
+          background: 'var(--card-bg, rgba(0, 0, 0, 0.2))',
           border: '1px solid rgba(255, 255, 255, 0.1)',
           padding: '0.75rem 1rem',
           borderRadius: 'calc(var(--border-radius) / 2)',
-          color: '#fff',
+          color: 'var(--text-color, #fff)',
           fontSize: '0.95rem',
           outline: 'none',
           fontFamily: 'var(--font-family)',
           transition: 'border-color 0.2s'
         }}
         onFocus={(e) => e.target.style.borderColor = 'var(--primary-color)'}
-        onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
+        onBlur={(e) => e.target.style.borderColor = 'var(--border-color, rgba(255, 255, 255, 0.1))'}
       />
       <button
         onClick={onSearch}
         style={{
           background: 'var(--primary-color)',
-          color: '#fff',
+          color: 'var(--text-color, #fff)',
           border: 'none',
           padding: '0.75rem 1.5rem',
           borderRadius: 'calc(var(--border-radius) / 2)',

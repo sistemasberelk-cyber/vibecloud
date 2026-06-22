@@ -18,11 +18,11 @@ export default function CartDetail({ items, onUpdateQuantity, onUpdatePriceType,
       flexDirection: 'column',
       gap: '1rem',
       height: '100%',
-      background: 'rgba(255, 255, 255, 0.02)',
+      background: 'var(--card-bg, rgba(255, 255, 255, 0.02))',
       border: '1px solid rgba(255, 255, 255, 0.05)',
       borderRadius: 'var(--border-radius)',
       padding: '1.2rem',
-      color: '#fff',
+      color: 'var(--text-color, #fff)',
       fontFamily: 'var(--font-family)'
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.75rem' }}>
@@ -32,7 +32,7 @@ export default function CartDetail({ items, onUpdateQuantity, onUpdatePriceType,
             onClick={onClearCart}
             style={{
               background: 'transparent',
-              color: 'rgba(255, 255, 255, 0.4)',
+              color: 'var(--text-color)', opacity: 0.4,
               border: 'none',
               cursor: 'pointer',
               fontSize: '0.8rem',
@@ -57,7 +57,7 @@ export default function CartDetail({ items, onUpdateQuantity, onUpdatePriceType,
           <div style={{
             textAlign: 'center',
             padding: '3rem 1rem',
-            color: 'rgba(255, 255, 255, 0.3)',
+            color: 'var(--text-color)', opacity: 0.3,
             fontSize: '0.9rem'
           }}>
             El carrito está vacío. Agregá productos desde el catálogo.
@@ -104,9 +104,9 @@ export default function CartDetail({ items, onUpdateQuantity, onUpdatePriceType,
                     value={item.price_type}
                     onChange={(e) => onUpdatePriceType(item.product.id, e.target.value)}
                     style={{
-                      background: 'rgba(0,0,0,0.3)',
+                      background: 'var(--card-bg, rgba(0, 0, 0, 0.3))',
                       border: '1px solid rgba(255, 255, 255, 0.1)',
-                      color: '#fff',
+                      color: 'var(--text-color, #fff)',
                       fontSize: '0.75rem',
                       borderRadius: '4px',
                       padding: '0.2rem 0.4rem',
@@ -122,9 +122,9 @@ export default function CartDetail({ items, onUpdateQuantity, onUpdatePriceType,
                     <button
                       onClick={() => onUpdateQuantity(item.product.id, item.quantity - 1)}
                       style={{
-                        background: 'rgba(255, 255, 255, 0.05)',
+                        background: 'var(--card-bg, rgba(255, 255, 255, 0.05))',
                         border: '1px solid rgba(255, 255, 255, 0.1)',
-                        color: '#fff',
+                        color: 'var(--text-color, #fff)',
                         width: '24px',
                         height: '24px',
                         borderRadius: '4px',
@@ -142,9 +142,9 @@ export default function CartDetail({ items, onUpdateQuantity, onUpdatePriceType,
                       onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1)}
                       disabled={item.quantity >= item.product.stock_quantity}
                       style={{
-                        background: 'rgba(255, 255, 255, 0.05)',
+                        background: 'var(--card-bg, rgba(255, 255, 255, 0.05))',
                         border: '1px solid rgba(255, 255, 255, 0.1)',
-                        color: '#fff',
+                        color: 'var(--text-color, #fff)',
                         width: '24px',
                         height: '24px',
                         borderRadius: '4px',

@@ -46,7 +46,7 @@ export default function DynamicViewRenderer({
   sales
 }) {
   if (!layout || !layout.modules) {
-    return <div style={{ color: '#fff', padding: '2rem', textAlign: 'center' }}>Cargando diseño...</div>;
+    return <div style={{ color: 'var(--text-color, #fff)', padding: '2rem', textAlign: 'center' }}>Cargando diseño...</div>;
   }
 
   const gridCols = layout.grid_cols || 12;

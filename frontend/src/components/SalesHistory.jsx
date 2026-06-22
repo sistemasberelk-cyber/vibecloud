@@ -13,11 +13,11 @@ export default function SalesHistory({ sales, totalCount }) {
 
   return (
     <div className="sdui-saleshistory" style={{
-      background: 'rgba(255, 255, 255, 0.02)',
+      background: 'var(--card-bg, rgba(255, 255, 255, 0.02))',
       border: '1px solid rgba(255, 255, 255, 0.05)',
       borderRadius: 'var(--border-radius)',
       padding: '1.2rem',
-      color: '#fff',
+      color: 'var(--text-color, #fff)',
       fontFamily: 'var(--font-family)',
       overflowX: 'auto'
     }}>
@@ -26,7 +26,7 @@ export default function SalesHistory({ sales, totalCount }) {
       </h2>
 
       {sales.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'rgba(255, 255, 255, 0.3)', fontSize: '0.9rem' }}>
+        <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-color)', opacity: 0.3, fontSize: '0.9rem' }}>
           No se registraron ventas en esta sesión.
         </div>
       ) : (

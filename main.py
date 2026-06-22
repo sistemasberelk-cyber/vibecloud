@@ -33,6 +33,8 @@ from routers.api.v1.auth import router as auth_v1_router
 from routers.api.v1.products import router as products_v1_router
 from routers.api.v1.sales import router as sales_v1_router
 from routers.api.v1.ui_config import router as ui_config_v1_router
+from routers.ai import router as ai_router
+from routers.store import router as store_router
 
 from web.logging_config import setup_logging
 setup_logging()
@@ -178,7 +180,10 @@ app.include_router(wms_router)
 app.include_router(auth_v1_router, prefix="/api/v1", tags=["Auth V1"])
 app.include_router(products_v1_router, prefix="/api/v1", tags=["Products V1"])
 app.include_router(sales_v1_router, prefix="/api/v1", tags=["Sales V1"])
-app.include_router(ui_config_v1_router, prefix="/api/v1", tags=["UI Config V1"])
+app.include_router(ui_config_v1_router, prefix="/api/v1/ui-config", tags=["UI Config V1"])
+
+app.include_router(ai_router)
+app.include_router(store_router)
 
 
 @app.get("/health")

@@ -13,7 +13,7 @@ export default function CatalogGrid({ products, page, pages, total, onPageChange
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        color: '#fff',
+        color: 'var(--text-color, #fff)',
         fontFamily: 'var(--font-family)'
       }}>
         <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600' }}>Catálogo de Productos</h2>
@@ -33,8 +33,8 @@ export default function CatalogGrid({ products, page, pages, total, onPageChange
             gridColumn: '1 / -1',
             textAlign: 'center',
             padding: '3rem',
-            color: 'rgba(255, 255, 255, 0.4)',
-            background: 'rgba(255, 255, 255, 0.02)',
+            color: 'var(--text-color)', opacity: 0.4,
+            background: 'var(--card-bg, rgba(255, 255, 255, 0.02))',
             borderRadius: 'var(--border-radius)',
             border: '1px dashed rgba(255, 255, 255, 0.1)',
             fontFamily: 'var(--font-family)'
@@ -46,7 +46,7 @@ export default function CatalogGrid({ products, page, pages, total, onPageChange
             <div
               key={product.id}
               style={{
-                background: 'rgba(255, 255, 255, 0.03)',
+                background: 'var(--card-bg, rgba(255, 255, 255, 0.03))',
                 border: '1px solid rgba(255, 255, 255, 0.05)',
                 borderRadius: 'var(--border-radius)',
                 padding: '1rem',
@@ -54,17 +54,17 @@ export default function CatalogGrid({ products, page, pages, total, onPageChange
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 gap: '0.5rem',
-                color: '#fff',
+                color: 'var(--text-color, #fff)',
                 fontFamily: 'var(--font-family)',
                 transition: 'transform 0.2s, border-color 0.2s'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                e.currentTarget.style.borderColor = 'var(--border-color, rgba(255, 255, 255, 0.15))';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                e.currentTarget.style.borderColor = 'var(--card-bg, rgba(255, 255, 255, 0.05))';
               }}
             >
               <div>
@@ -97,7 +97,7 @@ export default function CatalogGrid({ products, page, pages, total, onPageChange
                 onClick={() => onAddToCart(product)}
                 disabled={product.stock_quantity <= 0}
                 style={{
-                  background: product.stock_quantity > 0 ? 'var(--primary-color)' : 'rgba(255, 255, 255, 0.05)',
+                  background: product.stock_quantity > 0 ? 'var(--primary-color)' : 'var(--card-bg, rgba(255, 255, 255, 0.05))',
                   color: product.stock_quantity > 0 ? '#fff' : 'rgba(255, 255, 255, 0.3)',
                   border: 'none',
                   padding: '0.5rem',
@@ -129,14 +129,14 @@ export default function CatalogGrid({ products, page, pages, total, onPageChange
           gap: '1rem',
           marginTop: '0.5rem',
           fontFamily: 'var(--font-family)',
-          color: '#fff'
+          color: 'var(--text-color, #fff)'
         }}>
           <button
             onClick={() => onPageChange(page - 1)}
             disabled={page === 1}
             style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              color: '#fff',
+              background: 'var(--card-bg, rgba(255, 255, 255, 0.05))',
+              color: 'var(--text-color, #fff)',
               border: 'none',
               padding: '0.4rem 0.8rem',
               borderRadius: '4px',
@@ -151,8 +151,8 @@ export default function CatalogGrid({ products, page, pages, total, onPageChange
             onClick={() => onPageChange(page + 1)}
             disabled={page === pages}
             style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              color: '#fff',
+              background: 'var(--card-bg, rgba(255, 255, 255, 0.05))',
+              color: 'var(--text-color, #fff)',
               border: 'none',
               padding: '0.4rem 0.8rem',
               borderRadius: '4px',

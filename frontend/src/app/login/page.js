@@ -60,7 +60,7 @@ export default function LoginPage() {
       padding: '1.5rem'
     }}>
       <div style={{
-        background: 'rgba(255, 255, 255, 0.05)',
+        background: 'var(--card-bg, rgba(255, 255, 255, 0.05))',
         backdropFilter: 'blur(16px) saturate(180%)',
         WebkitBackdropFilter: 'blur(16px) saturate(180%)',
         border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -69,7 +69,7 @@ export default function LoginPage() {
         width: '100%',
         maxWidth: '420px',
         boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-        color: '#fff',
+        color: 'var(--text-color, #fff)',
         fontFamily: 'var(--font-family)',
         display: 'flex',
         flexDirection: 'column',
@@ -111,14 +111,14 @@ export default function LoginPage() {
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 padding: '0.8rem 1rem',
                 borderRadius: 'calc(var(--border-radius) / 2)',
-                color: '#fff',
+                color: 'var(--text-color, #fff)',
                 fontSize: '0.95rem',
                 outline: 'none',
                 fontFamily: 'var(--font-family)',
                 transition: 'border-color 0.2s'
               }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary-color)'}
-              onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border-color, rgba(255, 255, 255, 0.1))'}
             />
           </div>
 
@@ -134,14 +134,14 @@ export default function LoginPage() {
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 padding: '0.8rem 1rem',
                 borderRadius: 'calc(var(--border-radius) / 2)',
-                color: '#fff',
+                color: 'var(--text-color, #fff)',
                 fontSize: '0.95rem',
                 outline: 'none',
                 fontFamily: 'var(--font-family)',
                 transition: 'border-color 0.2s'
               }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary-color)'}
-              onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border-color, rgba(255, 255, 255, 0.1))'}
             />
           </div>
 
@@ -164,7 +164,7 @@ export default function LoginPage() {
             disabled={loading}
             style={{
               background: 'var(--primary-color)',
-              color: '#fff',
+              color: 'var(--text-color, #fff)',
               border: 'none',
               padding: '0.9rem',
               borderRadius: 'calc(var(--border-radius) / 2)',

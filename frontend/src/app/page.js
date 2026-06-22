@@ -252,7 +252,7 @@ export default function Home() {
         justifyContent: 'center',
         minHeight: '100vh',
         background: 'linear-gradient(135deg, #0f172a, #1e1b4b)',
-        color: '#fff',
+        color: 'var(--text-color, #fff)',
         fontFamily: 'var(--font-family, sans-serif)',
         fontSize: '1.2rem',
         fontWeight: '600'
