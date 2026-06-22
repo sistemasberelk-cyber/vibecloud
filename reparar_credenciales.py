@@ -11,7 +11,7 @@ def main():
         with open(env_path, "r") as f:
             content = f.read()
         for line in content.split("\n"):
-            if line.startswith("NEXPOS_FERNET_KEY="):
+            if line.startswith("VIBECLOUD_FERNET_KEY="):
                 fernet_key = line.split("=", 1)[1].strip()
 
     # 2. Generar la clave si no existe y agregarla al .env
@@ -19,13 +19,13 @@ def main():
         fernet_key = Fernet.generate_key().decode()
         with open(env_path, "a") as f:
             f.write(f"\n# Clave para cifrado de credenciales (generada para Fix 7)\n")
-            f.write(f"NEXPOS_FERNET_KEY={fernet_key}\n")
-        print("✅ Generada nueva clave NEXPOS_FERNET_KEY en el archivo .env")
+            f.write(f"VIBECLOUD_FERNET_KEY={fernet_key}\n")
+        print("✅ Generada nueva clave VIBECLOUD_FERNET_KEY en el archivo .env")
     else:
-        print("ℹ️ Clave NEXPOS_FERNET_KEY ya existe en .env")
+        print("ℹ️ Clave VIBECLOUD_FERNET_KEY ya existe en .env")
 
     # Guardar en el entorno para que database/models.py pueda usarla
-    os.environ["NEXPOS_FERNET_KEY"] = fernet_key
+    os.environ["VIBECLOUD_FERNET_KEY"] = fernet_key
 
     # Importar despues de setear la variable de entorno
     from database.models import AICredential, BusinessConfig, encrypt_api_key

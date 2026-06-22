@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-url = "https://berelk-backend-nexpos.onrender.com"
+url = "https://berelk-backend-vibecloud.onrender.com"
 login_url = f"{url}/login"
 
 session = requests.Session()

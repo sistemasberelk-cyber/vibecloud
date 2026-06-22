@@ -26,15 +26,15 @@ import os
 # ---------------------------------------------------------------------------
 # Cifrado de credenciales (FIX #7)
 # Requiere: pip install cryptography
-# Configurar variable de entorno: NEXPOS_FERNET_KEY=<fernet_key>
+# Configurar variable de entorno: VIBECLOUD_FERNET_KEY=<fernet_key>
 # Generar una vez con: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 # ---------------------------------------------------------------------------
 
 def _get_fernet() -> Fernet:
-    key = os.environ.get("NEXPOS_FERNET_KEY")
+    key = os.environ.get("VIBECLOUD_FERNET_KEY")
     if not key:
         raise RuntimeError(
-            "NEXPOS_FERNET_KEY no está configurada. "
+            "VIBECLOUD_FERNET_KEY no está configurada. "
             "Generá una clave con Fernet.generate_key() y agrégala como variable de entorno."
         )
     return Fernet(key.encode())

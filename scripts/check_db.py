@@ -2,7 +2,7 @@ from sqlmodel import create_engine, inspect
 import os
 
 # Try both locations to be sure
-paths = ["nexpos.db", "database/nexpos.db"]
+paths = ["vibecloud.db", "database/vibecloud.db"]
 
 for p in paths:
     if os.path.exists(p):

@@ -29,7 +29,7 @@
 <p class="section-label">Archivos generados</p>
 <div class="file-list">
   <span class="file-chip"><i class="ti ti-file" aria-hidden="true" style="font-size:14px"></i>database/models.py</span>
-  <span class="file-chip"><i class="ti ti-file" aria-hidden="true" style="font-size:14px"></i>alembic/nexpos_fixes_migration.py</span>
+  <span class="file-chip"><i class="ti ti-file" aria-hidden="true" style="font-size:14px"></i>alembic/vibecloud_fixes_migration.py</span>
   <span class="file-chip"><i class="ti ti-file" aria-hidden="true" style="font-size:14px"></i>scripts/backfill_stock_to_wms.py</span>
 </div>
 
@@ -95,7 +95,7 @@
       <span class="fix-badge badge-done">Fix 7</span>
       <span class="fix-title">Credenciales cifradas</span>
     </div>
-    <p class="fix-desc"><code>api_key</code> texto plano eliminado. Reemplazado por <code>api_key_enc</code> cifrado con Fernet. Requiere <code>NEXPOS_FERNET_KEY</code> en el entorno.</p>
+    <p class="fix-desc"><code>api_key</code> texto plano eliminado. Reemplazado por <code>api_key_enc</code> cifrado con Fernet. Requiere <code>VIBECLOUD_FERNET_KEY</code> en el entorno.</p>
     <div class="fix-files"><span class="fix-file">models.py</span><span class="fix-file">backfill.py</span></div>
   </div>
 

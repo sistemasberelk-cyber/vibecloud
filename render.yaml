@@ -8,6 +8,11 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
+      - key: ADMIN_PASSWORD
+        value: VibeCloudAdmin2026
+      - key: SUPERADMIN_PASSWORD
+        value: VibeCloudSuper2026
+
       - key: PYTHON_VERSION
         value: 3.11.0
       - key: DATABASE_URL
@@ -27,6 +32,11 @@ services:
     buildCommand: npm install && npm run build
     startCommand: npm run start
     envVars:
+      - key: ADMIN_PASSWORD
+        value: VibeCloudAdmin2026
+      - key: SUPERADMIN_PASSWORD
+        value: VibeCloudSuper2026
+
       - key: NODE_VERSION
         value: 20.11.0
       - key: NEXT_PUBLIC_API_URL

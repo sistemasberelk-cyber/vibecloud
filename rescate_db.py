@@ -11,14 +11,14 @@ def main():
     if os.path.exists(env_path):
         with open(env_path, "r") as f:
             for line in f.read().split("\n"):
-                if line.startswith("NEXPOS_FERNET_KEY="):
+                if line.startswith("VIBECLOUD_FERNET_KEY="):
                     fernet_key = line.split("=", 1)[1].strip()
     
     if not fernet_key:
         fernet_key = Fernet.generate_key().decode()
         with open(env_path, "a") as f:
-            f.write(f"\nNEXPOS_FERNET_KEY={fernet_key}\n")
-        print("✅ Generada nueva clave NEXPOS_FERNET_KEY en .env")
+            f.write(f"\nVIBECLOUD_FERNET_KEY={fernet_key}\n")
+        print("✅ Generada nueva clave VIBECLOUD_FERNET_KEY en .env")
     
     f = Fernet(fernet_key.encode())
     
