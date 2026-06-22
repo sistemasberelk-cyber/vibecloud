@@ -7,8 +7,8 @@ import json
 # In a real scenario, you'd use google-genai or google.generativeai here
 # For the MVP, we simulate the structure or call the REST API directly
 import httpx
-from database import get_db
-from models import User
+from database.session import get_session
+from database.models import User
 from web.dependencies import get_current_user
 
 router = APIRouter(prefix="/api/ai", tags=["AI Services"])
@@ -27,7 +27,7 @@ class ImageRequest(BaseModel):
     prompt: str
 
 @router.post("/copy")
-async def generate_copy(req: CopyRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def generate_copy(req: CopyRequest, db: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
     if not GEMINI_API_KEY:
         raise HTTPException(status_code=500, detail="Gemini API Key no configurada en el backend.")
     
@@ -48,7 +48,7 @@ async def generate_copy(req: CopyRequest, db: Session = Depends(get_db), current
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/theme")
-async def generate_theme(req: ThemeRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def generate_theme(req: ThemeRequest, db: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
     if not GEMINI_API_KEY:
         raise HTTPException(status_code=500, detail="Gemini API Key no configurada.")
     
@@ -81,6 +81,6 @@ async def generate_theme(req: ThemeRequest, db: Session = Depends(get_db), curre
         raise HTTPException(status_code=500, detail=f"Error parseando tema: {str(e)}")
 
 @router.post("/image")
-async def generate_image(req: ImageRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def generate_image(req: ImageRequest, db: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
     # Simulación de generación de imagen (Gemini Imagen 4 Fast o Vertex AI)
     return {"success": True, "image_url": "https://placehold.co/600x400/png?text=Generated+Image"}
