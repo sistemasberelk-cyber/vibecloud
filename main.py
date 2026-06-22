@@ -149,7 +149,7 @@ app = FastAPI(title="VibeCloud Cloud", lifespan=lifespan)
 
 # CORS
 def _get_cors_origins() -> list[str]:
-    raw = os.getenv("CORS_ORIGINS", "http://localhost,http://127.0.0.1")
+    raw = os.getenv("CORS_ORIGINS", "http://localhost,http://127.0.0.1,https://vibecloud-frontend.onrender.com,https://vibecloud.onrender.com,https://sistemasberelk-cyber.github.io")
     return [o.strip() for o in raw.split(",") if o.strip()] or ["http://localhost"]
 
 app.add_middleware(CORSMiddleware, allow_origins=_get_cors_origins(), allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
