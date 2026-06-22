@@ -65,7 +65,7 @@ def get_gemini_api_key(session: Session, tenant_id: int) -> str:
         detail="API Key de Gemini no configurada para este Tenant ni en las variables de entorno."
     )
 
-@router.get("/ui-config/{page_name}", response_model=UIConfigResponse)
+@router.get("/{page_name}", response_model=UIConfigResponse)
 def get_ui_config(
     page_name: str,
     session: Session = Depends(get_session),
@@ -105,7 +105,7 @@ def get_ui_config(
         updated_at=config.updated_at
     )
 
-@router.put("/ui-config/{page_name}", response_model=UIConfigResponse)
+@router.put("/{page_name}", response_model=UIConfigResponse)
 def update_ui_config(
     page_name: str,
     data: UIConfigRequest,
