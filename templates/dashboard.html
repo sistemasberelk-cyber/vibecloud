@@ -1,129 +1,82 @@
+{% extends "base.html" %}
 
-<h2 class="sr-only">Panel de correcciones VibeCloud — 8 fixes aplicados al sistema</h2>
+{% block title %}Dashboard - VibeCloud{% endblock %}
 
-<style>
-  .fix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; padding: 1rem 0; }
-  .fix-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 6px; }
-  .fix-header { display: flex; align-items: center; gap: 10px; }
-  .fix-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
-  .badge-done { background: #EAF3DE; color: #3B6D11; }
-  .fix-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
-  .fix-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
-  .fix-files { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
-  .fix-file { font-size: 11px; font-family: var(--font-mono); background: var(--color-background-secondary); color: var(--color-text-secondary); padding: 2px 7px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); }
-  .section-label { font-size: 12px; font-weight: 500; color: var(--color-text-tertiary); margin: 0.5rem 0 0; letter-spacing: 0.04em; text-transform: uppercase; }
-  .top-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-bottom: 0.75rem; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 0.5rem; }
-  .top-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
-  .top-meta { font-size: 13px; color: var(--color-text-secondary); }
-  .send-btn { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); cursor: pointer; border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-primary); margin-top: 1rem; }
-  .send-btn:hover { background: var(--color-background-secondary); }
-  .file-list { display: flex; gap: 6px; flex-wrap: wrap; padding: 0.5rem 0 0.75rem; }
-  .file-chip { font-size: 12px; font-family: var(--font-mono); background: var(--color-background-secondary); color: var(--color-text-secondary); padding: 4px 10px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; gap: 5px; }
-</style>
-
-<div class="top-bar">
-  <span class="top-title">VibeCloud — correcciones aplicadas</span>
-  <span class="top-meta">8 fixes &nbsp;·&nbsp; 3 archivos</span>
+{% block content %}
+<!-- Stats Grid -->
+<div class="grid-dashboard animate-fade-in">
+    <div class="glass-card stat-card">
+        <div class="stat-label">Ventas de Hoy</div>
+        <div class="stat-value" style="color: var(--accent-color);">${{ "%.2f"|format(today_sales_total) }}</div>
+    </div>
+    <div class="glass-card stat-card">
+        <div class="stat-label">Productos en Stock</div>
+        <div class="stat-value">{{ total_products | default(0) }}</div>
+    </div>
+    <div class="glass-card stat-card" style="border-left: 4px solid var(--danger-color);">
+        <div class="stat-label">Alertas de Stock</div>
+        <div class="stat-value" style="color: var(--danger-color);">{{ low_stock | default(0) }}</div>
+    </div>
 </div>
 
-<p class="section-label">Archivos generados</p>
-<div class="file-list">
-  <span class="file-chip"><i class="ti ti-file" aria-hidden="true" style="font-size:14px"></i>database/models.py</span>
-  <span class="file-chip"><i class="ti ti-file" aria-hidden="true" style="font-size:14px"></i>alembic/vibecloud_fixes_migration.py</span>
-  <span class="file-chip"><i class="ti ti-file" aria-hidden="true" style="font-size:14px"></i>scripts/backfill_stock_to_wms.py</span>
+
+<!-- Ingest Data Section -->
+<div class="glass-card" style="margin-bottom: 24px;">
+    <h2 style="margin-bottom: 16px;">Ingresar Datos</h2>
+    <div class="grid-dashboard" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <a href="/products" class="no-underline">
+            <div class="glass-card clickable-card" style="border: 2px solid var(--accent-color); text-align: center;">
+                <div style="font-size: 2em; margin-bottom: 10px;">📦</div>
+                <h3 style="margin: 0;">Productos</h3>
+                <p style="color: var(--text-muted); font-size: 0.9em;">Crear, editar y gestionar stock</p>
+            </div>
+        </a>
+        <a href="/clients" class="no-underline">
+            <div class="glass-card clickable-card" style="border: 2px solid var(--success-color); text-align: center;">
+                <div style="font-size: 2em; margin-bottom: 10px;">👥</div>
+                <h3 style="margin: 0;">Clientes</h3>
+                <p style="color: var(--text-muted); font-size: 0.9em;">Registrar nuevos clientes y cuentas</p>
+            </div>
+        </a>
+    </div>
 </div>
 
-<p class="section-label">Fixes</p>
-<div class="fix-grid">
+<!-- Quick Actions & Recent -->
+<div class="glass-card">
+    <h2 style="margin-bottom: 16px;">Actividad Reciente</h2>
 
-  <div class="fix-card">
-    <div class="fix-header">
-      <span class="fix-badge badge-done">Fix 1</span>
-      <span class="fix-title">ui_theme unificado</span>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Venta</th>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Placeholder Data -->
+                {% for sale in recent_sales %}
+                <tr>
+                    <td>#{{ sale.id }}</td>
+                    <td>{{ sale.timestamp.strftime('%H:%M') }}</td>
+                    <td>Contado</td>
+                    <td>${{ sale.total_amount }}</td>
+                    <td><span style="color: green;">Completado</span></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: var(--text-muted);">No hay ventas recientes</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <p class="fix-desc">Default del modelo cambiado de <code>"default"</code> a <code>"standard"</code>. La migración normaliza filas existentes.</p>
-    <div class="fix-files"><span class="fix-file">models.py</span><span class="fix-file">migration.py</span></div>
-  </div>
 
-  <div class="fix-card">
-    <div class="fix-header">
-      <span class="fix-badge badge-done">Fix 2</span>
-      <span class="fix-title">Soft delete completo</span>
+    <div style="margin-top: 24px; text-align: right;">
+        <a href="/pos" class="btn">Nueva Venta</a>
     </div>
-    <p class="fix-desc">Campos <code>is_deleted</code> + <code>deleted_at</code> agregados a <code>Supplier</code>, <code>User</code>, <code>Purchase</code>, <code>Location</code>, <code>Bin</code>.</p>
-    <div class="fix-files"><span class="fix-file">models.py</span><span class="fix-file">migration.py</span></div>
-  </div>
-
-  <div class="fix-card">
-    <div class="fix-header">
-      <span class="fix-badge badge-done">Fix 3</span>
-      <span class="fix-title">Barcode por tenant</span>
-    </div>
-    <p class="fix-desc"><code>unique=True</code> global eliminado. Reemplazado por <code>UniqueConstraint("tenant_id","barcode")</code>.</p>
-    <div class="fix-files"><span class="fix-file">models.py</span><span class="fix-file">migration.py</span></div>
-  </div>
-
-  <div class="fix-card">
-    <div class="fix-header">
-      <span class="fix-badge badge-done">Fix 4</span>
-      <span class="fix-title">Stock único — WMS</span>
-    </div>
-    <p class="fix-desc"><code>stock_quantity</code> eliminado de <code>Product</code>. Fuente única de verdad: <code>SUM(BinStock.quantity)</code>. El backfill migra los valores antes del drop.</p>
-    <div class="fix-files"><span class="fix-file">models.py</span><span class="fix-file">backfill.py</span></div>
-  </div>
-
-  <div class="fix-card">
-    <div class="fix-header">
-      <span class="fix-badge badge-done">Fix 5</span>
-      <span class="fix-title">Cuentas corrientes reales</span>
-    </div>
-    <p class="fix-desc">Nuevo modelo <code>AccountReceivable</code> con <code>sale_id</code>, <code>balance</code>, <code>due_date</code>, <code>status</code>. <code>Payment</code> ahora referencia la deuda específica.</p>
-    <div class="fix-files"><span class="fix-file">models.py</span><span class="fix-file">migration.py</span></div>
-  </div>
-
-  <div class="fix-card">
-    <div class="fix-header">
-      <span class="fix-badge badge-done">Fix 6</span>
-      <span class="fix-title">Pagos desacoplados</span>
-    </div>
-    <p class="fix-desc">Nuevo modelo <code>PaymentAllocation</code>. Una venta soporta N métodos (efectivo + QR + transferencia). La migración mueve los datos de <code>amount_cash</code>/<code>amount_transfer</code>.</p>
-    <div class="fix-files"><span class="fix-file">models.py</span><span class="fix-file">migration.py</span></div>
-  </div>
-
-  <div class="fix-card">
-    <div class="fix-header">
-      <span class="fix-badge badge-done">Fix 7</span>
-      <span class="fix-title">Credenciales cifradas</span>
-    </div>
-    <p class="fix-desc"><code>api_key</code> texto plano eliminado. Reemplazado por <code>api_key_enc</code> cifrado con Fernet. Requiere <code>VIBECLOUD_FERNET_KEY</code> en el entorno.</p>
-    <div class="fix-files"><span class="fix-file">models.py</span><span class="fix-file">backfill.py</span></div>
-  </div>
-
-  <div class="fix-card">
-    <div class="fix-header">
-      <span class="fix-badge badge-done">Fix 8</span>
-      <span class="fix-title">CashMovement trazable</span>
-    </div>
-    <p class="fix-desc"><code>sale_id</code> y <code>purchase_id</code> restaurados como FK tipadas en <code>CashMovement</code>. La migración backfilla desde <code>reference_id</code>/<code>reference_type</code>.</p>
-    <div class="fix-files"><span class="fix-file">models.py</span><span class="fix-file">migration.py</span></div>
-  </div>
-
 </div>
-
-<p class="section-label" style="margin-top:1.25rem">Orden de ejecución en producción</p>
-<div style="display:flex; flex-direction:column; gap:6px; padding-bottom:1rem">
-  <div style="display:flex; align-items:baseline; gap:10px; font-size:13px; color:var(--color-text-secondary)">
-    <span style="font-weight:500; color:var(--color-text-primary); min-width:16px">1.</span>
-    <code>python scripts/backfill_stock_to_wms.py --encrypt-keys</code>
-  </div>
-  <div style="display:flex; align-items:baseline; gap:10px; font-size:13px; color:var(--color-text-secondary)">
-    <span style="font-weight:500; color:var(--color-text-primary); min-width:16px">2.</span>
-    <code>python scripts/backfill_stock_to_wms.py</code>
-  </div>
-  <div style="display:flex; align-items:baseline; gap:10px; font-size:13px; color:var(--color-text-secondary)">
-    <span style="font-weight:500; color:var(--color-text-primary); min-width:16px">3.</span>
-    <code>alembic upgrade vibecloud_all_fixes</code>
-  </div>
-</div>
-
-<button class="send-btn" onclick="sendPrompt('Quiero ver el modelo AccountReceivable en detalle y cómo generar el Excel de cuenta corriente por cliente')">Ver AccountReceivable en detalle ↗</button>
+{% endblock %}
