@@ -16,13 +16,9 @@
     <div class="container">
         <nav class="navbar animate-fade-in">
             <a href="/" class="logo">
-                {% if settings.logo_url %}
-                <img src="{{ settings.logo_url }}" alt="{{ settings.company_name }}">
-                {% else %}
-                <div style="width: 32px; height: 32px; background: var(--accent-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">NP</div>
-                {% endif %}
+                <div style="width: 32px; height: 32px; background: var(--accent-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">VC</div>
                 <div style="display: flex; flex-direction: column; line-height: 1;">
-                    <span>{{ settings.company_name or 'VibeCloud' }}</span>
+                    <span>VibeCloud</span>
                     <small style="font-size: 0.6rem; opacity: 0.6; letter-spacing: 0.05em; text-transform: uppercase;">Cloud Retail</small>
                 </div>
             </a>

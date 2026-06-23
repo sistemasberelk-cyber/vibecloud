@@ -98,6 +98,10 @@ export default function Home() {
         setLoadingUI(true);
         const config = await apiRequest('/ui-config/pos');
         if (config && active) {
+          if (config.is_onboarded === false) {
+            router.push('/onboarding');
+            return;
+          }
           setUiConfig(config);
         }
         await fetchSales();

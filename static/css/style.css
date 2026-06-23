@@ -402,7 +402,7 @@ label {
 /* --- POS Specific --- */
 .pos-grid {
     display: grid;
-    grid-template-columns: 1fr 400px;
+    grid-template-columns: 350px 1fr;
     gap: 24px;
 }
 

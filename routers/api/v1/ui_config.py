@@ -23,6 +23,7 @@ class UIConfigResponse(BaseModel):
     layout: dict
     theme: dict
     updated_at: datetime
+    is_onboarded: bool = False
 
 class UIGenerateRequest(BaseModel):
     page_name: str
@@ -71,6 +72,10 @@ def get_ui_config(
     session: Session = Depends(get_session),
     user: User = Depends(get_current_user_jwt)
 ):
+    from database.models import Settings
+    settings = session.exec(select(Settings).where(Settings.tenant_id == user.tenant_id)).first()
+    is_onboarded = settings.is_onboarded if settings else False
+
     # Fetch from database, isolated by user's tenant_id
     config = session.exec(
         select(UIConfig).where(
@@ -85,7 +90,8 @@ def get_ui_config(
             page_name=page_name,
             layout=DEFAULT_LAYOUT,
             theme=DEFAULT_THEME,
-            updated_at=datetime.utcnow()
+            updated_at=datetime.utcnow(),
+            is_onboarded=is_onboarded
         )
 
     try:
@@ -102,7 +108,8 @@ def get_ui_config(
         page_name=config.page_name,
         layout=parsed_layout,
         theme=parsed_theme,
-        updated_at=config.updated_at
+        updated_at=config.updated_at,
+        is_onboarded=is_onboarded
     )
 
 @router.put("/{page_name}", response_model=UIConfigResponse)
@@ -112,6 +119,10 @@ def update_ui_config(
     session: Session = Depends(get_session),
     user: User = Depends(require_roles(["admin", "superadmin"]))
 ):
+    from database.models import Settings
+    settings = session.exec(select(Settings).where(Settings.tenant_id == user.tenant_id)).first()
+    is_onboarded = settings.is_onboarded if settings else False
+
     # Fetch existing config for this page and tenant
     config = session.exec(
         select(UIConfig).where(
