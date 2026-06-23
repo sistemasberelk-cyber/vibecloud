@@ -75,10 +75,11 @@ export default function Home() {
   // Fetch product catalog
   const fetchProducts = useCallback(async () => {
     try {
-      const url = `/products?page=${page}&limit=12${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ''}`;
+      const url = `/store/catalog`;
       const res = await apiRequest(url);
       if (res) {
         setProducts(res.items || []);
+        // In real world, we'd add pagination and search to /store/catalog
         setPages(res.pages || 1);
         setTotalProducts(res.total || 0);
       }

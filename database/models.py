@@ -89,6 +89,8 @@ class Settings(SQLModel, table=True):
 
     # FIX #1: default unificado con la migración DB (server_default='standard')
     ui_theme: str = Field(default="standard")  # standard, minimalist
+    is_onboarded: bool = Field(default=False)
+    onboarding_step: int = Field(default=1)
 
 
 # ===========================================================================
@@ -156,6 +158,18 @@ class User(SQLModel, table=True):
 # ===========================================================================
 # PRODUCT
 # ===========================================================================
+
+class TenantCatalog(SQLModel, table=True):
+    """
+    Tabla puente para almacenar qué productos mayoristas habilita cada minorista (Tenant)
+    """
+    id: Optional[int] = Field(default=None, primary_key=True)
+    tenant_id: int = Field(foreign_key="tenant.id", index=True)
+    product_id: int = Field(foreign_key="product.id", index=True)
+    
+    # Relationship placeholders if needed later
+    # tenant: Optional["Tenant"] = Relationship()
+    # product: Optional["Product"] = Relationship()
 
 class Product(SQLModel, table=True):
     """

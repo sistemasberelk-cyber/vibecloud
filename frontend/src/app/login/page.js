@@ -37,6 +37,8 @@ export default function LoginPage() {
         localStorage.setItem('accessToken', response.access_token);
         localStorage.setItem('refreshToken', response.refresh_token);
         localStorage.setItem('username', username);
+        // Set cookie for middleware
+        document.cookie = `is_onboarded=${response.is_onboarded}; path=/; max-age=604800`; // 7 days
         router.push('/');
       } else {
         setError('Error al recibir tokens de sesión.');

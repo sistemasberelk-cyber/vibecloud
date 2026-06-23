@@ -15,6 +15,7 @@ class LoginRequest(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
+    is_onboarded: bool = False
 
 class RefreshRequest(BaseModel):
     refresh_token: str
@@ -22,6 +23,7 @@ class RefreshRequest(BaseModel):
 class RefreshResponse(BaseModel):
     access_token: str
     refresh_token: str
+    is_onboarded: bool = False
 
 class LogoutRequest(BaseModel):
     refresh_token: str
@@ -91,7 +93,12 @@ def login(req: LoginRequest, session: Session = Depends(get_session)):
     session.add(db_token)
     session.commit()
     
-    return TokenResponse(access_token=access, refresh_token=raw_refresh)
+    # Fetch is_onboarded from Settings
+    from database.models import Settings
+    settings = session.exec(select(Settings).where(Settings.tenant_id == user.tenant_id)).first()
+    is_onboarded = settings.is_onboarded if settings else False
+
+    return TokenResponse(access_token=access, refresh_token=raw_refresh, is_onboarded=is_onboarded)
 
 @router.post("/auth/refresh", response_model=RefreshResponse)
 def refresh(req: RefreshRequest, session: Session = Depends(get_session)):
@@ -142,7 +149,12 @@ def refresh(req: RefreshRequest, session: Session = Depends(get_session)):
     session.add(new_db_token)
     session.commit()
     
-    return RefreshResponse(access_token=access, refresh_token=raw_refresh)
+    # Fetch is_onboarded from Settings
+    from database.models import Settings
+    settings = session.exec(select(Settings).where(Settings.tenant_id == user.tenant_id)).first()
+    is_onboarded = settings.is_onboarded if settings else False
+
+    return RefreshResponse(access_token=access, refresh_token=new_raw_refresh, is_onboarded=is_onboarded)
 
 @router.post("/auth/logout")
 def logout(req: LogoutRequest, session: Session = Depends(get_session)):

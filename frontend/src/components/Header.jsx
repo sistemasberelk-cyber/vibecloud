@@ -58,30 +58,20 @@ export default function Header({ user, onLogout }) {
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
         
-        {/* Theme Selector Dropdown */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>Tema:</span>
-          <select 
-            value={activeTheme}
-            onChange={(e) => handleThemeChange(e.target.value)}
-            style={{
-              background: 'var(--card-bg, rgba(0,0,0,0.2))',
-              color: 'var(--text-color, #fff)',
-              border: '1px solid var(--border-color, rgba(255,255,255,0.2))',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '4px',
-              fontSize: '0.85rem',
-              outline: 'none',
-              cursor: 'pointer'
-            }}
-          >
-            {predefinedCombinations.map(combo => (
-              <option key={combo.id} value={combo.id} style={{ color: '#000' }}>
-                {combo.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Admin Links */}
+        {(user?.role === 'admin' || user?.role === 'superadmin') && (
+          <a href="/admin/templates" style={{
+            fontSize: '0.85rem',
+            color: 'var(--text-color, #fff)',
+            textDecoration: 'none',
+            padding: '0.4rem 0.8rem',
+            background: 'var(--primary-color, rgba(255,255,255,0.1))',
+            borderRadius: '4px',
+            fontWeight: '600'
+          }}>
+            Administrar Diseño
+          </a>
+        )}
 
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{user?.full_name || user?.username}</div>
