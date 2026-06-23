@@ -95,3 +95,47 @@ async def get_onboarding_texts(step: str, niche: str = "general", db: Session = 
 async def generate_image(req: ImageRequest, db: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
     # Simulación de generación de imagen (Gemini Imagen 4 Fast o Vertex AI)
     return {"success": True, "image_url": "https://placehold.co/600x400/png?text=Generated+Image"}
+
+class ProductDescRequest(BaseModel):
+    product_name: str
+    features: str
+
+@router.post("/product-description")
+async def generate_product_description(req: ProductDescRequest, db: Session = Depends(get_session)):
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API Key no configurada.")
+    try:
+        desc = await GeminiService.generate_product_description(req.product_name, req.features, GEMINI_API_KEY)
+        return {"success": True, "description": desc}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+class LandingCopyRequest(BaseModel):
+    niche: str
+    audience: str
+    tone: str
+
+@router.post("/landing-copy")
+async def generate_landing_copy(req: LandingCopyRequest, db: Session = Depends(get_session)):
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API Key no configurada.")
+    try:
+        copy = await GeminiService.generate_landing_copy(req.niche, req.audience, req.tone, GEMINI_API_KEY)
+        return {"success": True, "copy": copy}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+class ChatRequest(BaseModel):
+    history: list
+    new_message: str
+    system_instruction: str = "Eres un asistente virtual de ventas amable."
+
+@router.post("/chat")
+async def chat_bot_response(req: ChatRequest, db: Session = Depends(get_session)):
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API Key no configurada.")
+    try:
+        response_text = await GeminiService.chat_bot_response(req.history, req.new_message, req.system_instruction, GEMINI_API_KEY)
+        return {"success": True, "response": response_text}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

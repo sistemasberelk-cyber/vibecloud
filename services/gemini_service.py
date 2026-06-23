@@ -216,3 +216,85 @@ class GeminiService:
         except json.JSONDecodeError:
             logger.error(f"Failed to parse Gemini daily theme output as JSON: {result_text}")
             raise ValueError("La respuesta de Gemini para el tema diario no es un JSON válido.")
+
+    @classmethod
+    async def generate_product_description(cls, product_name: str, features: str, api_key: str) -> str:
+        """
+        Generates a persuasive SEO-optimized product description in HTML.
+        """
+        system_instruction = "Eres un experto en copywriting para e-commerce."
+        prompt = f"""
+        Genera una descripción persuasiva, atractiva y optimizada para SEO para el siguiente producto:
+        Producto: {product_name}
+        Características clave: {features}
+        
+        Devuelve la descripción en formato HTML limpio (solo etiquetas <p>, <ul>, <li>, <strong>) para insertarlo directo en la web.
+        NO devuelvas bloques de código (```html), devuelve directamente el string HTML.
+        """
+        
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+        payload = {
+            "contents": [{"parts": [{"text": prompt}]}],
+            "systemInstruction": {"parts": [{"text": system_instruction}]}
+        }
+        
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.post(url, json=payload, timeout=30.0)
+                res_data = response.json()
+                text_content = res_data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                return text_content.replace('```html', '').replace('```', '').strip()
+            except Exception as e:
+                logger.error(f"Error calling Gemini for product description: {e}")
+                raise ValueError(f"Error de conexión con la API de Gemini: {e}")
+
+    @classmethod
+    async def generate_landing_copy(cls, niche: str, audience: str, tone: str, api_key: str) -> dict:
+        """
+        Generates structured copy for a landing page.
+        """
+        system_instruction = "Eres un experto creador de Landing Pages y copywriter para marketing digital."
+        prompt = f"""
+        Crea el texto para una Landing Page de un negocio de: {niche}.
+        El público objetivo es: {audience}.
+        El tono de la marca debe ser: {tone}.
+        
+        Debes retornar EXCLUSIVAMENTE un objeto JSON válido con esta estructura exacta:
+        {{
+            "h1": "Título principal que llame la atención",
+            "h2": "Subtítulo que explique el beneficio principal",
+            "bullets": ["Dolor que soluciona 1", "Dolor que soluciona 2", "Dolor que soluciona 3"],
+            "cta": "Llamado a la acción potente"
+        }}
+        No agregues markdown ni texto fuera del JSON.
+        """
+        result_text = await cls._call_gemini_api(prompt, system_instruction, api_key)
+        try:
+            return json.loads(result_text)
+        except json.JSONDecodeError:
+            logger.error(f"Failed to parse Gemini landing copy output as JSON: {result_text}")
+            raise ValueError("La respuesta de Gemini para Landing Copy no es un JSON válido.")
+
+    @classmethod
+    async def chat_bot_response(cls, history: list, new_message: str, system_instruction: str, api_key: str) -> str:
+        """
+        Handles chatbot multi-turn conversation.
+        """
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+        
+        contents = history + [{"role": "user", "parts": [{"text": new_message}]}]
+        
+        payload = {
+            "contents": contents,
+            "systemInstruction": {"parts": [{"text": system_instruction}]}
+        }
+        
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.post(url, json=payload, timeout=30.0)
+                res_data = response.json()
+                text_content = res_data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                return text_content
+            except Exception as e:
+                logger.error(f"Error calling Gemini for chatbot: {e}")
+                raise ValueError(f"Error de conexión con la API de Gemini chatbot: {e}")
