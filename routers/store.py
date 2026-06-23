@@ -6,7 +6,7 @@ from database.session import get_session
 from database.models import Settings, User, TenantCatalog, Product
 from web.dependencies import get_current_user, require_roles
 
-router = APIRouter(prefix="/api/store", tags=["Store Settings"])
+router = APIRouter(prefix="/api/v1/store", tags=["Store Settings"])
 
 class ThemeUpdateRequest(BaseModel):
     theme_id: str

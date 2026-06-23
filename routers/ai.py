@@ -12,7 +12,7 @@ from database.models import User
 from web.dependencies import get_current_user
 from services.gemini_service import GeminiService
 
-router = APIRouter(prefix="/api/ai", tags=["AI Services"])
+router = APIRouter(prefix="/api/v1/ai", tags=["AI Services"])
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
