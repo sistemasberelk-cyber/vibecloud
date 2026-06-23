@@ -44,70 +44,9 @@ from sqlalchemy import text
 
 def ensure_schema_compatibility(session: Session):
     """
-    DEPRECATED: This block is deprecated. All future schema changes must
-    go through Alembic migrations (alembic revision --autogenerate).
-    Do not add new columns or modify constraints here.
+    DEPRECATED: This block is deprecated and has been removed to speed up boot.
     """
-    stmts = [
-        "ALTER TABLE bin ADD COLUMN IF NOT EXISTS max_capacity INTEGER",
-        "ALTER TABLE bin ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
-        "ALTER TABLE bin ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
-        "ALTER TABLE binstock ADD COLUMN IF NOT EXISTS tenant_id INTEGER",
-        "ALTER TABLE binstock ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP",
-        "ALTER TABLE stockmovement ADD COLUMN IF NOT EXISTS tenant_id INTEGER",
-        "ALTER TABLE stockmovement ADD COLUMN IF NOT EXISTS request_id VARCHAR",
-        "ALTER TABLE stockmovement ADD COLUMN IF NOT EXISTS user_id INTEGER",
-        "ALTER TABLE cashmovement ADD COLUMN IF NOT EXISTS reference_id INTEGER",
-        "ALTER TABLE cashmovement ADD COLUMN IF NOT EXISTS reference_type VARCHAR",
-        "ALTER TABLE cashmovement ADD COLUMN IF NOT EXISTS user_id INTEGER",
-        "ALTER TABLE cashmovement ADD COLUMN IF NOT EXISTS sale_id INTEGER",
-        "ALTER TABLE cashmovement ADD COLUMN IF NOT EXISTS purchase_id INTEGER",
-        "ALTER TABLE payment ADD COLUMN IF NOT EXISTS receivable_id INTEGER",
-        "ALTER TABLE payment ADD COLUMN IF NOT EXISTS method VARCHAR DEFAULT 'cash'",
-        # "ALTER TABLE sale ADD COLUMN IF NOT EXISTS amount_cash FLOAT DEFAULT 0.0",
-        # "ALTER TABLE sale ADD COLUMN IF NOT EXISTS amount_transfer FLOAT DEFAULT 0.0",
-        # "ALTER TABLE sale ADD COLUMN IF NOT EXISTS payment_method VARCHAR DEFAULT 'cash'",
-        "ALTER TABLE product ADD COLUMN IF NOT EXISTS price_bulk FLOAT",
-        "ALTER TABLE product ADD COLUMN IF NOT EXISTS price_retail FLOAT",
-        "ALTER TABLE product ADD COLUMN IF NOT EXISTS cant_bulto INTEGER",
-        "ALTER TABLE product ADD COLUMN IF NOT EXISTS numeracion VARCHAR",
-        "ALTER TABLE product ADD COLUMN IF NOT EXISTS curve_quantity INTEGER DEFAULT 1",
-        "ALTER TABLE product ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
-        "ALTER TABLE product ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
-        "ALTER TABLE product ADD COLUMN IF NOT EXISTS item_number VARCHAR",
-        "ALTER TABLE product ADD COLUMN IF NOT EXISTS image_url VARCHAR",
-        "ALTER TABLE supplier ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
-        "ALTER TABLE supplier ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
-        "ALTER TABLE \"user\" ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
-        "ALTER TABLE \"user\" ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
-        "ALTER TABLE purchase ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
-        "ALTER TABLE purchase ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
-        "ALTER TABLE location ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
-        "ALTER TABLE location ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
-        "ALTER TABLE client ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE",
-        "ALTER TABLE client ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
-        "ALTER TABLE client ADD COLUMN IF NOT EXISTS credit_limit FLOAT",
-        "ALTER TABLE client ADD COLUMN IF NOT EXISTS razon_social VARCHAR",
-        "ALTER TABLE client ADD COLUMN IF NOT EXISTS cuit VARCHAR",
-        "ALTER TABLE client ADD COLUMN IF NOT EXISTS iva_category VARCHAR",
-        "ALTER TABLE client ADD COLUMN IF NOT EXISTS transport_name VARCHAR",
-        "ALTER TABLE client ADD COLUMN IF NOT EXISTS transport_address VARCHAR",
-        "ALTER TABLE settings ADD COLUMN IF NOT EXISTS ui_theme VARCHAR DEFAULT 'default'",
-        "ALTER TABLE aicredential ADD COLUMN IF NOT EXISTS api_key_enc VARCHAR",
-        "ALTER TABLE businessconfig ADD COLUMN IF NOT EXISTS openai_api_key_enc VARCHAR",
-        "ALTER TABLE businessconfig ADD COLUMN IF NOT EXISTS deepseek_api_key_enc VARCHAR",
-        "ALTER TABLE businessconfig ADD COLUMN IF NOT EXISTS elevenlabs_api_key_enc VARCHAR",
-    ]
-    for stmt in stmts:
-        try:
-            session.exec(text(stmt))
-            session.commit()
-        except Exception as e:
-            session.rollback()
-            err_msg = str(e).lower()
-            is_duplicate = "duplicate" in err_msg or "already exists" in err_msg
-            if not is_duplicate:
-                logger.warning(f"Schema compatibility check warning for stmt '{stmt}': {e}")
+    pass
 
 templates = CompatTemplates(directory="templates")
 
@@ -129,9 +68,12 @@ async def lifespan(app: FastAPI):
         logger.error(f"Alembic migration failed: {e}")
         # Fallback to simple table creation if alembic fails
         create_db_and_tables()
+        try:
+            command.stamp(alembic_cfg, "head")
+        except Exception:
+            pass
 
     with Session(engine) as session:
-        ensure_schema_compatibility(session)
         try:
             AuthService.create_default_user_and_settings(session)
         except Exception:
