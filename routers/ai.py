@@ -10,6 +10,7 @@ import httpx
 from database.session import get_session
 from database.models import User
 from web.dependencies import get_current_user
+from services.gemini_service import GeminiService
 
 router = APIRouter(prefix="/api/ai", tags=["AI Services"])
 
@@ -79,6 +80,16 @@ async def generate_theme(req: ThemeRequest, db: Session = Depends(get_session), 
             return {"success": True, "theme": theme_json}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error parseando tema: {str(e)}")
+
+@router.get("/onboarding/texts")
+async def get_onboarding_texts(step: str, niche: str = "general", db: Session = Depends(get_session)):
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API Key no configurada en el backend.")
+    try:
+        texts = await GeminiService.generate_onboarding_text(step, niche, GEMINI_API_KEY)
+        return texts
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/image")
 async def generate_image(req: ImageRequest, db: Session = Depends(get_session), current_user: User = Depends(get_current_user)):

@@ -112,6 +112,74 @@ class GeminiService:
             raise ValueError("La respuesta de Gemini no es un JSON válido.")
 
     @classmethod
+    async def generate_onboarding_text(cls, step: str, niche: str, api_key: str) -> dict:
+        ANTIGRAVITY_SYSTEM_PROMPT = """
+        Eres la voz oficial de **Antigravity**, una plataforma de tecnología avanzada que combina IA, diseño y automatización para impulsar negocios hacia el futuro.
+
+        Tu estilo es:
+        - Futurista y visionario.
+        - Energético y motivador.
+        - Claro y directo, pero con un toque inspirador.
+        - Usas metáforas espaciales, de gravedad, levitación y viajes en el tiempo cuando es apropiado.
+        - Evitas lenguaje demasiado técnico; traduces conceptos complejos en beneficios simples.
+
+        Tu objetivo en el onboarding es:
+        - Hacer que el usuario se sienta parte de algo grande e innovador.
+        - Guiarlo paso a paso con claridad y confianza.
+        - Personalizar el mensaje según su nicho y tipo de negocio.
+
+        Responde siempre en español, a menos que se te pida otro idioma.
+        DEBES RETORNAR ÚNICAMENTE UN JSON VÁLIDO CON LAS LLAVES: "title", "subtitle", "body". El contenido debe ser HTML limpio (solo <h1>, <h2>, <p>, <strong>).
+        """
+
+        if step == "1":
+            prompt = f"""
+            Genera el texto para la pantalla de **bienvenida** del onboarding.
+            Contexto: El usuario acaba de registrarse en Antigravity. Quiere crear su tienda online y sistema de facturación. Nicho: {niche}.
+            Tu objetivo es darle la bienvenida y explicarle qué puede lograr.
+            Por favor, genera:
+            1. Un título principal épico y futurista ("title").
+            2. Un subtítulo que resuma qué hará Antigravity por su negocio ("subtitle").
+            3. Un párrafo breve que invite a continuar ("body").
+            """
+        elif step == "2":
+            prompt = """
+            Genera el texto para la pantalla de **selección de nicho**.
+            Contexto: El usuario debe elegir el tipo de negocio.
+            Por favor, genera:
+            1. Un título que hable de 'elegir el universo de tu negocio' ("title").
+            2. Un subtítulo que explique por qué elegir el nicho correcto es importante ("subtitle").
+            3. Una descripción corta para que el usuario proceda a seleccionar las opciones abajo ("body").
+            """
+        elif step == "3":
+            prompt = f"""
+            Genera el texto para la pantalla de **configuración inicial de la marca**.
+            Contexto: El usuario ha elegido el nicho {niche}. Ahora debe poner nombre a su negocio y elegir colores.
+            Por favor, genera:
+            1. Un título que hable de 'dar vida a tu marca' o 'activar tu identidad' ("title").
+            2. Un subtítulo que explique por qué los colores y el logo son clave ("subtitle").
+            3. Un texto animando a completar el formulario inferior ("body").
+            """
+        elif step == "4":
+            prompt = f"""
+            Genera el texto para la pantalla final del onboarding: **"¡Todo listo!"**.
+            Contexto: El usuario de nicho {niche} ya configuró todo. Antigravity ha generado automáticamente su tienda.
+            Por favor, genera:
+            1. Un título épico, como "Tu negocio acaba de despegar" ("title").
+            2. Un subtítulo que resuma lo que ya tiene funcionando ("subtitle").
+            3. Una lista HTML (<ul><li>) de 3 logros: Tienda online lista, Sistema de facturación activado, Landing page generada por IA ("body").
+            """
+        else:
+            raise ValueError("Invalid step")
+
+        result_text = await cls._call_gemini_api(prompt, ANTIGRAVITY_SYSTEM_PROMPT, api_key)
+        try:
+            return json.loads(result_text)
+        except json.JSONDecodeError:
+            logger.error(f"Failed to parse Gemini output as JSON: {result_text}")
+            raise ValueError("La respuesta de Gemini no es un JSON válido.")
+
+    @classmethod
     async def generate_daily_theme(cls, date_str: str, api_key: str) -> dict:
         """
         Generates a theme configuration adapted to the date (seasons, events, holidays).
