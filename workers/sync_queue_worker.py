@@ -8,7 +8,7 @@ import logging
 from datetime import datetime
 from sqlmodel import Session
 from database.session import engine
-from services.medusa_sync import process_sync_queue
+from services.medusa_sync import medusa_sync_service
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ async def run_worker():
     while True:
         try:
             with Session(engine) as db:
-                result = await process_sync_queue(db)
+                result = await medusa_sync_service.process_queue(db)
                 if result["total"] > 0:
                     logger.info(
                         f"✅ Cola procesada: {result['processed']} ok, "
