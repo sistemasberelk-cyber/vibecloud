@@ -90,9 +90,29 @@ def get_product(
         raise HTTPException(404, "Producto no encontrado")
     return product
 
+from fastapi import BackgroundTasks
+import logging
+from services.medusa_sync import medusa_sync_service, MedusaSyncError
+
+logger = logging.getLogger(__name__)
+
+async def _sync_to_medusa_background(product_dict: dict, tenant_id: str) -> None:
+    try:
+        medusa_product = await medusa_sync_service.sync_product(product_dict, str(tenant_id))
+        logger.info(
+            "✅ Producto %s sincronizado con Medusa como %s",
+            product_dict["id"], medusa_product["id"],
+        )
+    except MedusaSyncError as exc:
+        logger.error(
+            "❌ Falló sync a Medusa para producto %s (tenant %s): %s",
+            product_dict["id"], tenant_id, exc,
+        )
+
 @router.post("/products", response_model=ProductResponse)
 def create_product(
     data: ProductCreate,
+    background_tasks: BackgroundTasks,
     session: Session = Depends(get_session),
     user: User = Depends(get_current_user_jwt)
 ):
@@ -111,6 +131,14 @@ def create_product(
     session.add(product)
     session.commit()
     session.refresh(product)
+
+    # Sync to Medusa
+    background_tasks.add_task(
+        _sync_to_medusa_background,
+        product.model_dump(),
+        user.tenant_id
+    )
+
     return product
 
 @router.put("/products/{id}", response_model=ProductResponse)

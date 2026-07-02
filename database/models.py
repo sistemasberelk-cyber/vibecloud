@@ -192,6 +192,8 @@ class Product(SQLModel, table=True):
     price: float = Field(default=0.0)
     price_bulk: Optional[float] = Field(default=None)
     price_retail: Optional[float] = Field(default=None)
+
+    medusa_product_id: Optional[str] = Field(default=None, index=True)
     cost_price: float = Field(default=0.0)
 
     # ELIMINADO: stock_quantity — fuente única de verdad es BinStock
