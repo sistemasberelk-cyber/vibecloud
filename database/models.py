@@ -227,6 +227,30 @@ class Product(SQLModel, table=True):
     def stock_quantity(self, value: int):
         pass
 
+from sqlalchemy.dialects.postgresql import JSONB
+import uuid as uuid_module
+from typing import Any, Dict
+
+class SyncQueue(SQLModel, table=True):
+    __tablename__ = "sync_queue"
+
+    id: str = Field(
+        default_factory=lambda: str(uuid_module.uuid4()),
+        primary_key=True
+    )
+    entity_type: str = Field(index=True)  # 'product' | 'inventory' | 'price'
+    entity_id: str = Field(index=True)
+    payload: Dict[str, Any] = Field(
+        default={},
+        sa_column=Column(JSONB)
+    )
+    status: str = Field(default="pending", index=True)
+    attempts: int = Field(default=0)
+    max_attempts: int = Field(default=5)
+    last_error: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
 
 # ===========================================================================
 # SALE / SALE ITEM
