@@ -1,43 +1,136 @@
+# render.yaml — VibeCloud Enterprise
+# Infrastructure as Code — 5 servicios
+# Generado: 2026-07-02
+
 services:
-  # 1. Backend Service (FastAPI)
+
+  # ── 1. NexPOS: FastAPI + Python ──────────────────────
   - type: web
     name: vibecloud-backend
     runtime: python
-    repo: https://github.com/sistemasberelk-cyber/vibecloud
-    plan: free
+    plan: starter
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    startCommand: >
+      uvicorn main:app
+      --host 0.0.0.0
+      --port $PORT
+      --workers 2
+      --log-level info
+    healthCheckPath: /health
     envVars:
-      - key: ADMIN_PASSWORD
-        value: VibeCloudAdmin2026
-      - key: SUPERADMIN_PASSWORD
-        value: VibeCloudSuper2026
-
-      - key: PYTHON_VERSION
-        value: 3.11.0
       - key: DATABASE_URL
-        value: postgresql://postgres.gfzhdtoytgoznrmysfan:VibeCloud2026Db@aws-1-us-east-2.pooler.supabase.com:6543/postgres
-      - key: SECRET_KEY
-        sync: false # Key used for signing session JWT tokens
+        sync: false          # ← setear en Render dashboard
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
       - key: GEMINI_API_KEY
-        sync: false # API Key for Server-Driven UI aesthetics generation
+        sync: false
+      - key: MEDUSA_URL
+        fromService:
+          name: vibecloud-medusa
+          type: web
+          property: url
+      - key: MEDUSA_ADMIN_API_KEY
+        sync: false
+      - key: NEXPOS_API_KEY
+        generateValue: true  # ← Render genera automáticamente
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ENVIRONMENT
+        value: production
 
-  # 2. Frontend Service (Next.js Adaptive UI)
+  # ── 2. Worker: retry de sync_queue ───────────────────
+  - type: worker
+    name: vibecloud-sync-worker
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: python workers/sync_queue_worker.py
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: MEDUSA_URL
+        fromService:
+          name: vibecloud-medusa
+          type: web
+          property: url
+      - key: MEDUSA_ADMIN_API_KEY
+        sync: false
+      - key: NEXPOS_API_KEY
+        sync: false
+
+  # ── 3. Medusa: Node.js E-commerce ────────────────────
   - type: web
-    name: vibecloud-frontend
+    name: vibecloud-medusa
     runtime: node
-    repo: https://github.com/sistemasberelk-cyber/vibecloud
-    plan: free
-    rootDir: frontend
+    plan: starter
+    rootDir: medusa-develop
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /health/ready
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          name: vibecloud-redis
+          type: redis
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: COOKIE_SECRET
+        generateValue: true
+      - key: MEDUSA_ADMIN_API_KEY
+        generateValue: true
+      - key: NEXPOS_API_URL
+        fromService:
+          name: vibecloud-backend
+          type: web
+          property: url
+      - key: NEXPOS_API_KEY
+        fromService:
+          name: vibecloud-backend
+          type: web
+          envVarKey: NEXPOS_API_KEY
+      - key: STORE_CORS
+        fromService:
+          name: vibecloud-storefront
+          type: web
+          property: url
+      - key: ADMIN_CORS
+        fromService:
+          name: vibecloud-storefront
+          type: web
+          property: url
+      - key: NODE_ENV
+        value: production
+
+  # ── 4. Storefront: Next.js B2C ────────────────────────
+  - type: web
+    name: vibecloud-storefront
+    runtime: node
+    plan: starter
+    rootDir: storefront
     buildCommand: npm install && npm run build
     startCommand: npm run start
     envVars:
-      - key: ADMIN_PASSWORD
-        value: VibeCloudAdmin2026
-      - key: SUPERADMIN_PASSWORD
-        value: VibeCloudSuper2026
+      - key: NEXT_PUBLIC_MEDUSA_URL
+        fromService:
+          name: vibecloud-medusa
+          type: web
+          property: url
+      - key: NEXT_PUBLIC_NEXPOS_URL
+        fromService:
+          name: vibecloud-backend
+          type: web
+          property: url
+      - key: NODE_ENV
+        value: production
 
-      - key: NODE_VERSION
-        value: 20.11.0
-      - key: NEXT_PUBLIC_API_URL
-        value: https://vibecloud-backend.onrender.com/api/v1 # Update this if the backend URL differs
+  # ── 5. Redis: Background Jobs Medusa ─────────────────
+  - type: redis
+    name: vibecloud-redis
+    plan: starter
+    maxmemoryPolicy: noeviction
+    ipAllowList: []          # solo acceso interno entre servicios
