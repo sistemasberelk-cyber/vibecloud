@@ -172,12 +172,37 @@ class GeminiService:
         else:
             raise ValueError("Invalid step")
 
-        result_text = await cls._call_gemini_api(prompt, ANTIGRAVITY_SYSTEM_PROMPT, api_key)
         try:
+            result_text = await cls._call_gemini_api(prompt, ANTIGRAVITY_SYSTEM_PROMPT, api_key)
             return json.loads(result_text)
-        except json.JSONDecodeError:
-            logger.error(f"Failed to parse Gemini output as JSON: {result_text}")
-            raise ValueError("La respuesta de Gemini no es un JSON válido.")
+        except Exception as e:
+            logger.warning(f"Gemini API rate limited or failed (using robust offline fallback): {e}")
+            # Fallback robusto sin emojis y con diseño limpio en base al paso y nicho
+            if step == "1":
+                return {
+                    "title": "Bienvenido a la Facturacion del Futuro",
+                    "subtitle": f"Tu portal B2B para {niche} esta despegando.",
+                    "body": "<p>Hemos activado tu base de operaciones. Haz clic abajo para iniciar la configuracion del sistema de inventario y canales de venta de manera automatica.</p>"
+                }
+            elif step == "2":
+                return {
+                    "title": "Configura tu Universo Comercial",
+                    "subtitle": "Selecciona el nicho para adaptar el catalogo y reglas de negocio.",
+                    "body": "<p>Cada industria tiene sus propias reglas. Elige la categoria que mejor represente tus productos para habilitar modulos especificos.</p>"
+                }
+            elif step == "3":
+                return {
+                    "title": "Identidad de Marca Activa",
+                    "subtitle": "Establece los colores de acento para tu Server-Driven UI.",
+                    "body": "<p>Define el nombre de tu empresa y el esquema de color. La interfaz de Next.js se adaptara en tiempo real utilizando las variables inyectadas.</p>"
+                }
+            else:
+                return {
+                    "title": "Sistema en Orbita y Listo",
+                    "subtitle": "Los canales de distribucion han sido sincronizados.",
+                    "body": "<ul><li>Catalogo online B2B/B2C publicado.</li><li>Control de stock e idempotencia activado.</li><li>Panel de facturacion listo para operar.</li></ul>"
+                }
+
 
     @classmethod
     async def generate_daily_theme(cls, date_str: str, api_key: str) -> dict:
