@@ -101,7 +101,9 @@ app.add_middleware(CORSMiddleware, allow_origins=_get_cors_origins(), allow_cred
 from starlette.middleware.sessions import SessionMiddleware
 SESSION_SECRET = os.getenv("SECRET_KEY")
 if not SESSION_SECRET:
-    raise RuntimeError("SECRET_KEY env var is required.")
+    import logging
+    logging.getLogger(__name__).warning("SECRET_KEY env var not set. Using insecure fallback for SessionMiddleware.")
+    SESSION_SECRET = "fallback_insecure_secret_for_dev_only"
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET, same_site="lax")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

@@ -409,3 +409,4 @@ sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in
 2026-06-21 17:04:30,934 [INFO] httpx: HTTP Request: PUT http://testserver/api/v1/ui-config/pos "HTTP/1.1 200 OK"
 2026-06-21 17:04:30,971 [INFO] httpx: HTTP Request: PUT http://testserver/api/v1/ui-config/dashboard "HTTP/1.1 200 OK"
 2026-06-21 17:04:30,977 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/ui-config/dashboard "HTTP/1.1 200 OK"
+2026-07-03 04:28:03,602 [INFO] root: Logging system initialized.

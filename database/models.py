@@ -227,6 +227,7 @@ class Product(SQLModel, table=True):
     def stock_quantity(self, value: int):
         pass
 
+from sqlalchemy import Text, Index, inspect, Column
 from sqlalchemy.dialects.postgresql import JSONB
 import uuid as uuid_module
 from typing import Any, Dict
