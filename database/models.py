@@ -253,6 +253,14 @@ class SyncQueue(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 
+class ProcessedWebhook(SQLModel, table=True):
+    __tablename__ = "processed_webhooks"
+
+    event_id: str = Field(primary_key=True)
+    source: str = Field(default="medusa")
+    processed_at: datetime = Field(default_factory=datetime.utcnow)
+    status: str = Field(default="processed")
+
 # ===========================================================================
 # SALE / SALE ITEM
 # ===========================================================================

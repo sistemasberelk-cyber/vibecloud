@@ -317,6 +317,13 @@ class MedusaSyncService:
             item.updated_at = datetime.utcnow()
             db.add(item)
             db.commit()
+            
+            if item.attempts >= item.max_attempts:
+                logger.error(
+                    f"⚠️ MAX ATTEMPTS REACHED: SyncQueue {item.id} "
+                    f"failed after {item.attempts} attempts. Error: {item.last_error} "
+                    f"Payload: {item.payload}"
+                )
 
         return {"processed": processed, "errors": errors, "total": len(items)}
 

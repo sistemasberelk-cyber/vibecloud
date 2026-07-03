@@ -8,7 +8,9 @@ from contextlib import asynccontextmanager
 from datetime import datetime, date
 import os
 import logging
-
+import httpx
+from pythonjsonlogger import jsonlogger
+from core.config import settings
 from database.session import create_db_and_tables, get_session, engine
 from database.models import Product, Sale, Settings, User, Tenant
 from database.seed_data import seed_products
@@ -33,10 +35,20 @@ from routers.api.v1.auth import router as auth_v1_router
 from routers.api.v1.products import router as products_v1_router
 from routers.api.v1.sales import router as sales_v1_router
 from routers.api.v1.ui_config import router as ui_config_v1_router
+from routers.api.v1.inventory import router as inventory_v1_router
 from routers.ai import router as ai_router
 from routers.store import router as store_router
 
-from web.logging_config import setup_logging
+def setup_logging():
+    logHandler = logging.FileHandler(filename='logs/vibecloud.log')
+    formatter = jsonlogger.JsonFormatter('%(asctime)s %(levelname)s %(name)s %(message)s')
+    logHandler.setFormatter(formatter)
+    
+    streamHandler = logging.StreamHandler()
+    streamHandler.setFormatter(formatter)
+    
+    logging.basicConfig(level=logging.INFO, handlers=[logHandler, streamHandler])
+
 setup_logging()
 logger = logging.getLogger(__name__)
 
@@ -125,6 +137,7 @@ app.include_router(auth_v1_router, prefix="/api/v1", tags=["Auth V1"])
 app.include_router(products_v1_router, prefix="/api/v1", tags=["Products V1"])
 app.include_router(sales_v1_router, prefix="/api/v1", tags=["Sales V1"])
 app.include_router(ui_config_v1_router, prefix="/api/v1/ui-config", tags=["UI Config V1"])
+app.include_router(inventory_v1_router, prefix="/api/v1/inventory", tags=["Inventory V1"])
 
 app.include_router(ai_router)
 app.include_router(store_router)
@@ -132,8 +145,27 @@ app.include_router(store_router)
 
 @app.get("/health")
 @app.head("/health")
-def health_check():
-    return {"status": "ok"}
+async def health_check(session: Session = Depends(get_session)):
+    status = "healthy"
+    services = {"database": "ok", "medusa": "ok"}
+    try:
+        session.execute(text("SELECT 1"))
+    except Exception as e:
+        status = "degraded"
+        services["database"] = f"error: {str(e)}"
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(
+                f"{settings.MEDUSA_URL}/admin/products?limit=1", 
+                headers={"Authorization": f"Bearer {settings.MEDUSA_ADMIN_API_KEY}"}
+            )
+            resp.raise_for_status()
+    except Exception as e:
+        status = "degraded"
+        services["medusa"] = f"error: {str(e)}"
+        
+    return {"status": status, "services": services}
 
 
 @app.get("/fix-db")
