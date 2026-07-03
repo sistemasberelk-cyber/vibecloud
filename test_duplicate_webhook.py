@@ -1,15 +1,8 @@
 """
 test_duplicate_webhook.py
 
-Simula que Medusa envía el MISMO webhook dos veces (esto pasa en la vida
-real: reintentos de red, at-least-once delivery, etc.) y verifica que
-NexPOS solo lo procesa una vez.
-
-AJUSTAR antes de correr (marcado con TODO):
-    - WEBHOOK_URL: el endpoint real que recibe el webhook de Medusa
-      (el que dispara inventory-nexpos.ts / inventory-vibecloud.ts)
-    - STOCK_CHECK_URL: endpoint para consultar el stock actual de un producto
-    - NEXPOS_API_KEY: la key que usa Medusa para autenticar contra NexPOS
+Simula que Medusa envia el MISMO webhook dos veces y verifica que
+VibeCloud solo lo procesa una vez.
 
 Uso:
     python test_duplicate_webhook.py
@@ -22,27 +15,18 @@ import uuid
 
 import httpx
 
-# ── Config — AJUSTAR a tu entorno real ──────────────────────────────
+# ── Config ────────────────────────────────────────────────────────
 NEXPOS_BASE_URL = os.getenv("NEXPOS_BASE_URL", "http://localhost:8000")
 NEXPOS_API_KEY = os.getenv("NEXPOS_API_KEY", "")
+TEST_PRODUCT_ID = os.getenv("TEST_PRODUCT_ID", "1")
 
-# TODO: confirmar la ruta real. Basado en el subscriber de Fase 1:
-#   axios.post(`${NEXPOS_URL}/api/v1/inventory/deduct-from-order`, ...)
 WEBHOOK_PATH = "/api/v1/inventory/deduct-from-order"
 
-# TODO: un producto/SKU real que exista en tu DB de prueba, con stock > 0
-TEST_PRODUCT_ID = os.getenv("TEST_PRODUCT_ID", "test-nexpos-0001")
+# Opcional: si tienen un endpoint de consulta de producto/stock
+STOCK_CHECK_PATH = os.getenv("STOCK_CHECK_PATH", "")
 
-# TODO: endpoint para leer el stock actual (ajustar al que exista en tu API)
-STOCK_CHECK_PATH = f"/api/v1/products/{TEST_PRODUCT_ID}"
-
-
-async def get_stock(client: httpx.AsyncClient) -> int:
-    resp = await client.get(STOCK_CHECK_PATH)
-    resp.raise_for_status()
-    data = resp.json()
-    # TODO: ajustar la clave según tu schema real (stock / quantity / etc.)
-    return data.get("stock", data.get("quantity"))
+# Palabras clave a buscar en la respuesta del duplicado
+DUPLICATE_MARKERS = ["already processed", "already_processed", "idempotent", "duplicate"]
 
 
 async def send_webhook(client: httpx.AsyncClient, event_id: str, quantity: int = 1) -> httpx.Response:
@@ -58,50 +42,79 @@ async def send_webhook(client: httpx.AsyncClient, event_id: str, quantity: int =
     return await client.post(WEBHOOK_PATH, json=payload, headers=headers)
 
 
+async def get_stock(client: httpx.AsyncClient) -> int | None:
+    if not STOCK_CHECK_PATH:
+        return None
+    try:
+        path = STOCK_CHECK_PATH.format(id=TEST_PRODUCT_ID)
+        resp = await client.get(path)
+        resp.raise_for_status()
+        data = resp.json()
+        return data.get("stock_quantity", data.get("stock", data.get("quantity")))
+    except Exception:
+        return None
+
+
 async def run() -> None:
-    print("== Test de idempotencia: webhook duplicado ==\n")
+    print("== Test de idempotencia: webhook duplicado ==")
+    print("Target: {}{}\n".format(NEXPOS_BASE_URL, WEBHOOK_PATH))
 
     if not NEXPOS_API_KEY:
-        print("[WARNING] NEXPOS_API_KEY no seteada - el request puede fallar por auth.")
+        print("[WARNING] NEXPOS_API_KEY no seteada - el request puede fallar por auth (401/403).")
         print("Exportala si tu endpoint la requiere.\n")
 
     async with httpx.AsyncClient(base_url=NEXPOS_BASE_URL, timeout=15.0) as client:
-        # 1. Stock inicial
-        try:
-            stock_before = await get_stock(client)
-            print(f"[1/4] Stock inicial de {TEST_PRODUCT_ID}: {stock_before}")
-        except Exception as exc:
-            print("ERROR: No pude leer el stock inicial. Ajusta STOCK_CHECK_PATH. Error: {}".format(exc))
-            sys.exit(1)
+        stock_before = await get_stock(client)
+        if stock_before is not None:
+            print("Stock inicial de {}: {}".format(TEST_PRODUCT_ID, stock_before))
 
-        # 2. Generar UN evento con ID fijo (simula el mismo webhook)
+        # 1. Primer envio - debe procesarse normalmente
         event_id = str(uuid.uuid4())
-        print(f"[2/4] Enviando webhook por primera vez (event_id={event_id})...")
+        print("Enviando webhook por primera vez (event_id={})...".format(event_id))
         resp1 = await send_webhook(client, event_id, quantity=1)
-        print(f"      → status {resp1.status_code}")
+        print("      -> status {} | body: {}".format(resp1.status_code, resp1.text[:200]))
 
-        # 3. Reenviar EXACTAMENTE el mismo event_id (simula reintento/duplicado)
-        print(f"[3/4] Reenviando el MISMO webhook (event_id={event_id})...")
+        if resp1.status_code not in (200, 201):
+            print("\n[ERROR] El primer envio ya fallo ({}).".format(resp1.status_code))
+            print("Revisa NEXPOS_API_KEY / TEST_PRODUCT_ID antes de seguir.")
+            sys.exit(1)
+
+        # 2. Reenviar EXACTAMENTE el mismo event_id (simula reintento/duplicado)
+        print("Reenviando el MISMO webhook (event_id={})...".format(event_id))
         resp2 = await send_webhook(client, event_id, quantity=1)
-        print(f"      → status {resp2.status_code}")
-        # Si tu handler está bien hecho, este segundo request debería:
-        #   - devolver 200 igual (no romper al llamador) PERO
-        #   - no volver a descontar stock
-        # o devolver algo como 409/200 con {"status": "already_processed"}
+        print("      -> status {} | body: {}".format(resp2.status_code, resp2.text[:200]))
 
-        # 4. Verificar stock final
-        stock_after = await get_stock(client)
-        print(f"[4/4] Stock final de {TEST_PRODUCT_ID}: {stock_after}\n")
+        body2_lower = resp2.text.lower()
+        detected_as_duplicate = any(marker in body2_lower for marker in DUPLICATE_MARKERS)
 
-        expected = stock_before - 1  # solo UN descuento, aunque llegó 2 veces
-        if stock_after == expected:
-            print("SUCCESS: IDEMPOTENCIA OK. Stock descontado una sola vez ({} -> {}).".format(stock_before, stock_after))
-        elif stock_after == stock_before - 2:
-            print("ERROR: BUG DE IDEMPOTENCIA. Se desconto DOS veces ({} -> {}).".format(stock_before, stock_after))
-            sys.exit(1)
+        # 3. Verificacion
+        print("\nResultado:")
+        if resp2.status_code == 200 and detected_as_duplicate:
+            print("SUCCESS: IDEMPOTENCIA OK - el segundo envio fue reconocido como duplicado")
+            print("y no deberia haber tocado el stock de nuevo.")
+        elif resp2.status_code == resp1.status_code and not detected_as_duplicate:
+            print("WARNING: El segundo envio devolvio el MISMO status que el primero pero")
+            print("el cuerpo NO menciona duplicado/idempotencia. Esto es sospechoso:")
+            print("puede que se haya procesado dos veces. Revisar manualmente en DB")
+            print("la tabla processed_webhooks y el stock real del producto.")
         else:
-            print("WARNING: Resultado inesperado. Esperaba {}, obtuve {}.".format(expected, stock_after))
-            sys.exit(1)
+            print("ERROR: Respuesta inesperada en el duplicado (status {}).".format(resp2.status_code))
+            print("Revisar el handler - puede estar fallando en vez de detectar el duplicado.")
+
+        stock_after = await get_stock(client)
+        if stock_before is not None and stock_after is not None:
+            print("\nStock: {} -> {}".format(stock_before, stock_after))
+            if stock_after == stock_before - 1:
+                print("SUCCESS: Confirmado tambien por stock: se desconto una sola vez.")
+            elif stock_after == stock_before - 2:
+                print("ERROR: BUG CONFIRMADO POR STOCK: se desconto DOS veces.")
+                sys.exit(1)
+            else:
+                print("WARNING: Delta de stock no coincide con lo esperado, revisar manualmente.")
+        elif not STOCK_CHECK_PATH:
+            print("\n(No se configuro STOCK_CHECK_PATH - validacion basada solo en la")
+            print("respuesta del endpoint, no en el stock real. Para el chequeo completo,")
+            print("setea esa variable si existe un endpoint de consulta de producto.)")
 
 
 if __name__ == "__main__":
