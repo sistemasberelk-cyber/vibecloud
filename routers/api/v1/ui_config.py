@@ -288,3 +288,44 @@ async def force_daily_theme(
         "message": f"Tema diario generado con éxito para la fecha {today_str}",
         "theme": new_theme
     }
+
+@router.get("/public/{tenant_id}/{page_name}", response_model=UIConfigResponse)
+def get_public_ui_config(
+    tenant_id: int,
+    page_name: str,
+    session: Session = Depends(get_session)
+):
+    """Obtener UI Config de forma pública (para el Storefront SDUI)"""
+    config = session.exec(
+        select(UIConfig).where(
+            UIConfig.tenant_id == tenant_id,
+            UIConfig.page_name == page_name
+        )
+    ).first()
+
+    if not config:
+        return UIConfigResponse(
+            page_name=page_name,
+            layout=DEFAULT_LAYOUT,
+            theme=DEFAULT_THEME,
+            updated_at=datetime.utcnow(),
+            is_onboarded=True
+        )
+
+    try:
+        parsed_layout = json.loads(config.layout_json)
+    except Exception:
+        parsed_layout = DEFAULT_LAYOUT
+
+    try:
+        parsed_theme = json.loads(config.theme_json)
+    except Exception:
+        parsed_theme = DEFAULT_THEME
+
+    return UIConfigResponse(
+        page_name=page_name,
+        layout=parsed_layout,
+        theme=parsed_theme,
+        updated_at=config.updated_at,
+        is_onboarded=True
+    )
