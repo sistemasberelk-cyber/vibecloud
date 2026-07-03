@@ -3,10 +3,19 @@
 @import "tailwindcss/utilities";
 
 @layer base {
-  body {
+  html {
+    @apply transition-colors duration-300;
+  }
+  
+  html[data-mode="dark"] body {
     @apply bg-zinc-950 text-zinc-50 antialiased selection:bg-primary/30;
   }
+
+  html[data-mode="light"] body {
+    @apply bg-zinc-50 text-zinc-900 antialiased selection:bg-primary/20;
+  }
 }
+
 
 
 @layer utilities {
