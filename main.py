@@ -87,24 +87,31 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"Alembic migration failed: {e}")
         # Fallback to simple table creation if alembic fails
-        create_db_and_tables()
         try:
-            command.stamp(alembic_cfg, "head")
-        except Exception:
-            pass
+            create_db_and_tables()
+        except Exception as e2:
+            logger.error(f"Fallback create_db_and_tables also failed: {e2}")
 
-    with Session(engine) as session:
-        try:
-            AuthService.create_default_user_and_settings(session)
-        except Exception:
-            session.rollback()
-            raise
-        if os.getenv("SEED_ON_START") == "1":
-            seed_products(session)
+    try:
+        with Session(engine) as session:
+            try:
+                AuthService.create_default_user_and_settings(session)
+            except Exception as e:
+                session.rollback()
+                logger.error(f"AuthService setup failed (non-fatal): {e}")
+            if os.getenv("SEED_ON_START") == "1":
+                seed_products(session)
+    except Exception as e:
+        logger.error(f"Session setup failed (non-fatal): {e}")
 
     # Start background daily theme scheduler
-    from web.scheduler import start_theme_scheduler
-    start_theme_scheduler()
+    try:
+        import asyncio
+        from web.scheduler import theme_scheduler_loop
+        asyncio.ensure_future(theme_scheduler_loop())
+        logger.info("Theme scheduler started.")
+    except Exception as e:
+        logger.error(f"Theme scheduler failed to start (non-fatal): {e}")
 
     yield
 
