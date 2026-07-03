@@ -2,6 +2,13 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+@layer base {
+  body {
+    @apply bg-zinc-950 text-zinc-50 antialiased selection:bg-primary/30;
+  }
+}
+
+
 @layer utilities {
   /* Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
