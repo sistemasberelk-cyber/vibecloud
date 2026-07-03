@@ -48,7 +48,7 @@ async def create_b2b_customer():
         wholesale = next((g for g in groups if g["name"] == "Wholesale"), None)
         
         if not wholesale:
-            print("❌ El grupo Wholesale no existe. Asegúrate de haber sincronizado al menos un producto con price_bulk desde NexPOS.")
+            print("❌ El grupo Wholesale no existe. Asegúrate de haber sincronizado al menos un producto con price_bulk desde VibeCloud.")
             return
 
         group_id = wholesale["id"]

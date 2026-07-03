@@ -1,7 +1,7 @@
 """
 test_medusa_sync.py
 
-Script standalone para validar la conexión NexPOS -> Medusa ANTES de
+Script standalone para validar la conexión VibeCloud -> Medusa ANTES de
 engancharlo al router de producción. No requiere pytest, corre directo:
 
     python test_medusa_sync.py
@@ -19,9 +19,9 @@ from services.medusa_sync import medusa_sync_service, MedusaSyncError, MedusaAut
 
 # Producto de prueba simulando lo que generaría GeminiService
 FAKE_AI_PRODUCT = {
-    "id": "test-nexpos-0001",
+    "id": "test-vibecloud-0001",
     "title": "Zapatilla Antigravity X1 (PoC Test)",
-    "description": "Producto de prueba generado para validar Fase 1 de la fusión NexPOS x Medusa.",
+    "description": "Producto de prueba generado para validar Fase 1 de la fusión VibeCloud x Medusa.",
     "sku": "AGX1-TEST-001",
     "price": 149.99,
     "currency": "usd",
@@ -32,7 +32,7 @@ TEST_TENANT_ID = "tenant-poc-001"
 
 
 async def run() -> None:
-    print("== PoC Fase 1: Test de conexión NexPOS -> Medusa ==\n")
+    print("== PoC Fase 1: Test de conexión VibeCloud -> Medusa ==\n")
 
     # 1. Autenticación
     print("[1/3] Probando autenticación contra Medusa...")

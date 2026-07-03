@@ -4,7 +4,7 @@
 
 services:
 
-  # ── 1. NexPOS: FastAPI + Python ──────────────────────
+  # ── 1. VibeCloud: FastAPI + Python ──────────────────────
   - type: web
     name: vibecloud-backend
     runtime: python
@@ -33,7 +33,7 @@ services:
           property: url
       - key: MEDUSA_ADMIN_API_KEY
         sync: false
-      - key: NEXPOS_API_KEY
+      - key: VIBECLOUD_API_KEY
         generateValue: true  # ← Render genera automáticamente
       - key: SECRET_KEY
         generateValue: true
@@ -57,7 +57,7 @@ services:
           property: url
       - key: MEDUSA_ADMIN_API_KEY
         sync: false
-      - key: NEXPOS_API_KEY
+      - key: VIBECLOUD_API_KEY
         sync: false
 
   # ── 3. Medusa: Node.js E-commerce ────────────────────
@@ -83,16 +83,16 @@ services:
         generateValue: true
       - key: MEDUSA_ADMIN_API_KEY
         generateValue: true
-      - key: NEXPOS_API_URL
+      - key: VIBECLOUD_API_URL
         fromService:
           name: vibecloud-backend
           type: web
           property: url
-      - key: NEXPOS_API_KEY
+      - key: VIBECLOUD_API_KEY
         fromService:
           name: vibecloud-backend
           type: web
-          envVarKey: NEXPOS_API_KEY
+          envVarKey: VIBECLOUD_API_KEY
       - key: STORE_CORS
         fromService:
           name: vibecloud-storefront
@@ -120,7 +120,7 @@ services:
           name: vibecloud-medusa
           type: web
           property: url
-      - key: NEXT_PUBLIC_NEXPOS_URL
+      - key: NEXT_PUBLIC_VIBECLOUD_URL
         fromService:
           name: vibecloud-backend
           type: web

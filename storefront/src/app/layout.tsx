@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 
 async function getSDUIConfig(tenantId: number, page: string) {
   try {
-    const nexposUrl = process.env.NEXT_PUBLIC_NEXPOS_URL || "http://localhost:8000"
-    const res = await fetch(`${nexposUrl}/api/v1/ui-config/public/${tenantId}/${page}`, {
+    const vibecloudUrl = process.env.NEXT_PUBLIC_VIBECLOUD_URL || "http://localhost:8000"
+    const res = await fetch(`${vibecloudUrl}/api/v1/ui-config/public/${tenantId}/${page}`, {
       next: { revalidate: 30 }
     })
     if (!res.ok) return null

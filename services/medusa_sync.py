@@ -3,7 +3,7 @@ services/medusa_sync.py
 
 Cliente REST asíncrono hacia la Admin API de Medusa (v2).
 Responsable de: autenticación, upsert de productos, y mapeo del schema
-"NexPOS Product" (generado por Gemini) -> "Medusa Product".
+"VibeCloud Product" (generado por Gemini) -> "Medusa Product".
 
 Diseño: sigue el mismo patrón de servicio que GeminiService / StockService
 ("Fat Models, Thin Routers"). Se instancia una sola vez (singleton a nivel
@@ -88,63 +88,63 @@ class MedusaSyncService:
         raise MedusaSyncError(f"Fallaron {MAX_RETRIES} intentos contra Medusa: {last_exc}")
 
     # ------------------------------------------------------------------
-    # Mapeo de schema: NexPOS (Gemini) -> Medusa
+    # Mapeo de schema: VibeCloud (Gemini) -> Medusa
     # ------------------------------------------------------------------
     @staticmethod
-    def _map_product_payload(nexpos_product: dict, tenant_id: str) -> dict:
-        variants = nexpos_product.get("variants") or [
+    def _map_product_payload(vibecloud_product: dict, tenant_id: str) -> dict:
+        variants = vibecloud_product.get("variants") or [
             {
                 "title": "Default",
-                "sku": nexpos_product.get("sku"),
+                "sku": vibecloud_product.get("sku"),
                 "prices": [
                     {
-                        "amount": int(round(nexpos_product.get("price", 0) * 100)),  # Medusa usa centavos
-                        "currency_code": nexpos_product.get("currency", "usd"),
+                        "amount": int(round(vibecloud_product.get("price", 0) * 100)),  # Medusa usa centavos
+                        "currency_code": vibecloud_product.get("currency", "usd"),
                     }
                 ],
             }
         ]
 
         return {
-            "title": nexpos_product.get("title", ""),
-            "description": nexpos_product.get("description", ""),
-            "status": "published" if nexpos_product.get("is_active", True) else "draft",
-            "options": nexpos_product.get("options", [{"title": "Default"}]),
+            "title": vibecloud_product.get("title", ""),
+            "description": vibecloud_product.get("description", ""),
+            "status": "published" if vibecloud_product.get("is_active", True) else "draft",
+            "options": vibecloud_product.get("options", [{"title": "Default"}]),
             "variants": variants,
-            "images": [{"url": url} for url in nexpos_product.get("image_urls", [])],
+            "images": [{"url": url} for url in vibecloud_product.get("image_urls", [])],
             "metadata": {
                 "tenant_id": tenant_id,
-                "nexpos_product_id": str(nexpos_product.get("id", "")),
-                "source": "nexpos-ai-webbuilder",
+                "vibecloud_product_id": str(vibecloud_product.get("id", "")),
+                "source": "vibecloud-ai-webbuilder",
             },
         }
 
     # ------------------------------------------------------------------
     # API pública del servicio
     # ------------------------------------------------------------------
-    async def find_by_nexpos_id(self, tenant_id: str, nexpos_product_id: str) -> dict | None:
+    async def find_by_vibecloud_id(self, tenant_id: str, vibecloud_product_id: str) -> dict | None:
         resp = await self._request(
             "GET",
             "/admin/products",
-            params={"q": nexpos_product_id, "limit": 1},
+            params={"q": vibecloud_product_id, "limit": 1},
         )
         resp.raise_for_status()
         results = resp.json().get("products", [])
         for p in results:
             meta = p.get("metadata") or {}
-            if meta.get("nexpos_product_id") == str(nexpos_product_id) and meta.get("tenant_id") == tenant_id:
+            if meta.get("vibecloud_product_id") == str(vibecloud_product_id) and meta.get("tenant_id") == tenant_id:
                 return p
         return None
 
-    async def create_product(self, nexpos_product: dict, tenant_id: str) -> dict:
-        payload = self._map_product_payload(nexpos_product, tenant_id)
+    async def create_product(self, vibecloud_product: dict, tenant_id: str) -> dict:
+        payload = self._map_product_payload(vibecloud_product, tenant_id)
         resp = await self._request("POST", "/admin/products", json=payload)
         if resp.status_code not in (200, 201):
             raise MedusaSyncError(f"Error creando producto en Medusa: {resp.status_code} {resp.text}")
         return resp.json()["product"]
 
-    async def update_product(self, medusa_product_id: str, nexpos_product: dict, tenant_id: str) -> dict:
-        payload = self._map_product_payload(nexpos_product, tenant_id)
+    async def update_product(self, medusa_product_id: str, vibecloud_product: dict, tenant_id: str) -> dict:
+        payload = self._map_product_payload(vibecloud_product, tenant_id)
         resp = await self._request("POST", f"/admin/products/{medusa_product_id}", json=payload)
         if resp.status_code != 200:
             raise MedusaSyncError(f"Error actualizando producto en Medusa: {resp.status_code} {resp.text}")
@@ -214,7 +214,7 @@ class MedusaSyncService:
                 "/admin/price-lists",
                 json={
                     "name": "Mayorista B2B — Descuento 30%",
-                    "description": "Precios mayoristas automáticos desde NexPOS",
+                    "description": "Precios mayoristas automáticos desde VibeCloud",
                     "type": "sale",
                     "status": "active",
                     "rules": rules,
@@ -245,7 +245,7 @@ class MedusaSyncService:
 
     async def sync_product_safe(
         self,
-        nexpos_product: dict,
+        vibecloud_product: dict,
         tenant_id: str,
         db: Session,
         known_medusa_id: str | None = None,
@@ -257,29 +257,29 @@ class MedusaSyncService:
         try:
             medusa_id = known_medusa_id
             if not medusa_id:
-                existing = await self.find_by_nexpos_id(tenant_id, nexpos_product.get("id", ""))
+                existing = await self.find_by_vibecloud_id(tenant_id, vibecloud_product.get("id", ""))
                 medusa_id = existing["id"] if existing else None
 
             if medusa_id:
-                logger.info("Producto %s ya existe en Medusa (%s), actualizando.", nexpos_product.get("id"), medusa_id)
-                medusa_product = await self.update_product(medusa_id, nexpos_product, tenant_id)
+                logger.info("Producto %s ya existe en Medusa (%s), actualizando.", vibecloud_product.get("id"), medusa_id)
+                medusa_product = await self.update_product(medusa_id, vibecloud_product, tenant_id)
             else:
-                logger.info("Producto %s no existe en Medusa, creando.", nexpos_product.get("id"))
-                medusa_product = await self.create_product(nexpos_product, tenant_id)
+                logger.info("Producto %s no existe en Medusa, creando.", vibecloud_product.get("id"))
+                medusa_product = await self.create_product(vibecloud_product, tenant_id)
 
             # Sync bulk price
-            if nexpos_product.get("price_bulk"):
-                await self.sync_bulk_price(medusa_product, nexpos_product["price_bulk"])
+            if vibecloud_product.get("price_bulk"):
+                await self.sync_bulk_price(medusa_product, vibecloud_product["price_bulk"])
 
             return {"status": "synced", "medusa_id": medusa_product["id"]}
 
         except MedusaSyncError as e:
-            logger.error(f"❌ Error al sincronizar producto {nexpos_product.get('id')}: {e}")
-            self.enqueue(db, "product", nexpos_product, error=str(e))
+            logger.error(f"❌ Error al sincronizar producto {vibecloud_product.get('id')}: {e}")
+            self.enqueue(db, "product", vibecloud_product, error=str(e))
             return {"status": "failed", "error": str(e)}
         except Exception as e:
             logger.error(f"⚠️ Medusa no disponible o error fatal. Encolando: {e}")
-            self.enqueue(db, "product", nexpos_product, error=str(e))
+            self.enqueue(db, "product", vibecloud_product, error=str(e))
             return {"status": "queued", "error": str(e)}
 
     async def process_queue(self, db: Session) -> dict:
