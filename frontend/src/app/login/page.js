@@ -8,7 +8,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Clear any old session details when visiting login page
   useEffect(() => {
@@ -58,142 +58,225 @@ export default function LoginPage() {
       justifyContent: 'center',
       minHeight: '100vh',
       width: '100%',
-      background: 'var(--background-gradient)',
-      padding: '1.5rem'
+      // Premium mesh gradient background
+      background: 'radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.15), transparent 25%), radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.15), transparent 25%), linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
+      padding: '1.5rem',
+      fontFamily: 'Inter, system-ui, sans-serif'
     }}>
       <div style={{
-        background: 'var(--card-bg, rgba(255, 255, 255, 0.05))',
-        backdropFilter: 'blur(16px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(16px) saturate(180%)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: 'var(--border-radius)',
-        padding: '2.5rem',
+        background: 'rgba(30, 41, 59, 0.4)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        borderRadius: '24px',
+        padding: '3rem',
         width: '100%',
-        maxWidth: '420px',
-        boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-        color: 'var(--text-color, #fff)',
-        fontFamily: 'var(--font-family)',
+        maxWidth: '440px',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+        color: '#f8fafc',
         display: 'flex',
         flexDirection: 'column',
-        gap: '1.5rem'
+        gap: '2rem',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
+        {/* Subtle glow effect inside the card */}
+        <div style={{
+          position: 'absolute',
+          top: '-50%',
+          left: '-50%',
+          width: '200%',
+          height: '200%',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 60%)',
+          pointerEvents: 'none'
+        }} />
+
         {/* Header Branding */}
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
           <h1 style={{
-            fontSize: '2rem',
-            fontWeight: '700',
-            margin: 0,
-            letterSpacing: '-0.02em',
-            background: 'linear-gradient(to right, #ffffff, rgba(255,255,255,0.7))',
+            fontSize: '2.5rem',
+            fontWeight: '800',
+            margin: '0 0 0.5rem 0',
+            letterSpacing: '-0.03em',
+            background: 'linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%)',
             WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
+            WebkitTextFillColor: 'transparent',
+            filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))'
           }}>
-            VibeCloud <span style={{ color: 'var(--primary-color)', WebkitTextFillColor: 'initial' }}>SaaS</span>
+            VibeCloud
           </h1>
           <p style={{
-            fontSize: '0.85rem',
-            opacity: 0.7,
-            marginTop: '0.5rem'
+            fontSize: '0.9rem',
+            color: '#94a3b8',
+            fontWeight: '500',
+            letterSpacing: '0.01em',
+            margin: 0
           }}>
-            Portal de Acceso Mayorista adaptativo
+            Portal de Acceso Mayorista
           </p>
         </div>
 
         {/* Login Form */}
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: '600', opacity: 0.85 }}>Usuario</label>
-            <input
-              type="text"
-              placeholder="Ingrese su usuario"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              style={{
-                background: 'rgba(0, 0, 0, 0.25)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                padding: '0.8rem 1rem',
-                borderRadius: 'calc(var(--border-radius) / 2)',
-                color: 'var(--text-color, #fff)',
-                fontSize: '0.95rem',
-                outline: 'none',
-                fontFamily: 'var(--font-family)',
-                transition: 'border-color 0.2s'
-              }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--primary-color)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--border-color, rgba(255, 255, 255, 0.1))'}
-            />
+        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'relative', zIndex: 1 }}>
+          
+          {/* User Input */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#cbd5e1' }}>Usuario</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                placeholder="Ingresa tu usuario"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: 'rgba(15, 23, 42, 0.6)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  padding: '1rem 1.2rem',
+                  borderRadius: '12px',
+                  color: '#ffffff',
+                  fontSize: '1rem',
+                  outline: 'none',
+                  transition: 'all 0.3s ease',
+                  boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#818cf8';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(129, 140, 248, 0.2), inset 0 2px 4px rgba(0,0,0,0.2)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                  e.target.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.2)';
+                }}
+              />
+            </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: '600', opacity: 0.85 }}>Contraseña</label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{
-                background: 'rgba(0, 0, 0, 0.25)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                padding: '0.8rem 1rem',
-                borderRadius: 'calc(var(--border-radius) / 2)',
-                color: 'var(--text-color, #fff)',
-                fontSize: '0.95rem',
-                outline: 'none',
-                fontFamily: 'var(--font-family)',
-                transition: 'border-color 0.2s'
-              }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--primary-color)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--border-color, rgba(255, 255, 255, 0.1))'}
-            />
+          {/* Password Input */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#cbd5e1' }}>Contraseña</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: 'rgba(15, 23, 42, 0.6)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  padding: '1rem 1.2rem',
+                  borderRadius: '12px',
+                  color: '#ffffff',
+                  fontSize: '1rem',
+                  outline: 'none',
+                  transition: 'all 0.3s ease',
+                  boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#818cf8';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(129, 140, 248, 0.2), inset 0 2px 4px rgba(0,0,0,0.2)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                  e.target.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.2)';
+                }}
+              />
+            </div>
           </div>
 
+          {/* Error Message */}
           {error && (
             <div style={{
-              color: '#ef4444',
-              background: 'rgba(239, 68, 68, 0.1)',
-              border: '1px solid rgba(239, 68, 68, 0.2)',
-              borderRadius: '6px',
-              padding: '0.6rem 0.8rem',
-              fontSize: '0.8rem',
-              fontWeight: '500'
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              color: '#fca5a5',
+              background: 'rgba(239, 68, 68, 0.15)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: '10px',
+              padding: '0.8rem 1rem',
+              fontSize: '0.85rem',
+              fontWeight: '500',
+              animation: 'fadeIn 0.3s ease'
             }}>
-              ⚠️ {error}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              {error}
             </div>
           )}
 
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
             style={{
-              background: 'var(--primary-color)',
-              color: 'var(--text-color, #fff)',
-              border: 'none',
-              padding: '0.9rem',
-              borderRadius: 'calc(var(--border-radius) / 2)',
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+              color: '#ffffff',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              padding: '1rem',
+              borderRadius: '12px',
               cursor: loading ? 'not-allowed' : 'pointer',
               fontWeight: '700',
               fontSize: '1rem',
-              fontFamily: 'var(--font-family)',
               marginTop: '0.5rem',
-              transition: 'opacity 0.2s',
-              opacity: loading ? 0.7 : 1
+              transition: 'all 0.3s ease',
+              boxShadow: '0 10px 20px -10px rgba(99, 102, 241, 0.5)',
+              opacity: loading ? 0.7 : 1,
+              transform: loading ? 'scale(0.98)' : 'scale(1)'
             }}
-            onMouseEnter={(e) => { if (!loading) e.target.style.opacity = 0.9; }}
-            onMouseLeave={(e) => { if (!loading) e.target.style.opacity = 1; }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 15px 25px -10px rgba(99, 102, 241, 0.6)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 10px 20px -10px rgba(99, 102, 241, 0.5)';
+              }
+            }}
           >
-            {loading ? 'Iniciando Sesión...' : 'Ingresar'}
+            {loading ? (
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}>
+                  <path d="M21 12a9 9 0 11-6.219-8.56"></path>
+                </svg>
+                Iniciando Sesión...
+              </span>
+            ) : 'Ingresar'}
           </button>
         </form>
 
+        {/* Footer */}
         <div style={{
           textAlign: 'center',
           fontSize: '0.75rem',
-          opacity: 0.5,
-          marginTop: '0.5rem'
+          color: '#64748b',
+          marginTop: '1rem',
+          position: 'relative',
+          zIndex: 1
         }}>
-          VibeCloud SaaS &copy; 2026. Todos los derechos reservados.
+          VibeCloud SaaS &copy; 2026. <br/> Todos los derechos reservados.
         </div>
       </div>
+
+      {/* Global styles for animations since we use inline styles mostly */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-5px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        * { box-sizing: border-box; }
+      `}} />
     </div>
   );
 }

@@ -36,6 +36,7 @@ from routers.api.v1.products import router as products_v1_router
 from routers.api.v1.sales import router as sales_v1_router
 from routers.api.v1.ui_config import router as ui_config_v1_router
 from routers.api.v1.inventory import router as inventory_v1_router
+from routers.api.v1.medusa_sync import router as medusa_sync_v1_router
 from routers.ai import router as ai_router
 from routers.store import router as store_router
 
@@ -153,6 +154,7 @@ app.include_router(products_v1_router, prefix="/api/v1", tags=["Products V1"])
 app.include_router(sales_v1_router, prefix="/api/v1", tags=["Sales V1"])
 app.include_router(ui_config_v1_router, prefix="/api/v1/ui-config", tags=["UI Config V1"])
 app.include_router(inventory_v1_router, prefix="/api/v1/inventory", tags=["Inventory V1"])
+app.include_router(medusa_sync_v1_router, prefix="/api/v1", tags=["Medusa Sync V1"])
 
 app.include_router(ai_router)
 app.include_router(store_router)
@@ -289,3 +291,11 @@ def get_dashboard(request: Request, user: User = Depends(require_auth), settings
 @app.get("/pos", response_class=HTMLResponse)
 def get_pos(request: Request, user: User = Depends(require_auth), settings: Settings = Depends(get_settings)):
     return templates.TemplateResponse("pos.html", {"request": request, "active_page": "pos", "settings": settings, "user": user})
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    import traceback
+    with open('crash.log', 'w') as f:
+        f.write(traceback.format_exc())
+    from fastapi.responses import PlainTextResponse
+    return PlainTextResponse(str(exc), status_code=500)

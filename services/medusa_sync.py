@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import os
 import time
+import asyncio
 import logging
 from typing import Any
 from datetime import datetime
@@ -40,6 +41,11 @@ class MedusaSyncService:
         self._token: str | None = None
         self._token_expires_at: float = 0.0
         self._client = httpx.AsyncClient(base_url=self.base_url, timeout=REQUEST_TIMEOUT)
+        
+        # Caché de IDs B2B
+        self._wholesale_group_id: str | None = None
+        self._wholesale_price_list_id: str | None = None
+        self._b2b_sales_channel_id: str | None = None
 
     # ------------------------------------------------------------------
     # Autenticación
@@ -83,7 +89,7 @@ class MedusaSyncService:
                     attempt, MAX_RETRIES, method, path, exc,
                 )
                 if attempt < MAX_RETRIES:
-                    time.sleep(RETRY_BACKOFF_SECONDS * attempt)
+                    await asyncio.sleep(RETRY_BACKOFF_SECONDS * attempt)
 
         raise MedusaSyncError(f"Fallaron {MAX_RETRIES} intentos contra Medusa: {last_exc}")
 
@@ -162,42 +168,47 @@ class MedusaSyncService:
         variant_id = variants[0]["id"]
 
         # Buscar el Customer Group "Wholesale"
-        groups_resp = await self._request(
-            "GET",
-            "/admin/customer-groups",
-            params={"q": "Wholesale"},
-        )
-        groups = groups_resp.json().get("customer_groups", [])
-        wholesale = next((g for g in groups if g["name"] == "Wholesale"), None)
-
-        if not wholesale:
-            logger.warning("Customer Group 'Wholesale' no existe — creando")
-            create_resp = await self._request(
-                "POST",
+        if not self._wholesale_group_id:
+            groups_resp = await self._request(
+                "GET",
                 "/admin/customer-groups",
-                json={"name": "Wholesale"},
+                params={"q": "Wholesale"},
             )
-            wholesale = create_resp.json()["customer_group"]
+            groups = groups_resp.json().get("customer_groups", [])
+            wholesale = next((g for g in groups if g["name"] == "Wholesale"), None)
+
+            if not wholesale:
+                logger.warning("Customer Group 'Wholesale' no existe — creando")
+                create_resp = await self._request(
+                    "POST",
+                    "/admin/customer-groups",
+                    json={"name": "Wholesale"},
+                )
+                wholesale = create_resp.json()["customer_group"]
+            self._wholesale_group_id = wholesale["id"]
 
         # Buscar Price List existente para Wholesale
-        pl_resp = await self._request(
-            "GET",
-            "/admin/price-lists",
-            params={"q": "Mayorista B2B"},
-        )
-        price_lists = pl_resp.json().get("price_lists", [])
-        existing_pl = next(
-            (p for p in price_lists if "Mayorista B2B" in p.get("name", "")),
-            None
-        )
+        if not self._wholesale_price_list_id:
+            pl_resp = await self._request(
+                "GET",
+                "/admin/price-lists",
+                params={"q": "Mayorista B2B"},
+            )
+            price_lists = pl_resp.json().get("price_lists", [])
+            existing_pl = next(
+                (p for p in price_lists if "Mayorista B2B" in p.get("name", "")),
+                None
+            )
+            if existing_pl:
+                self._wholesale_price_list_id = existing_pl["id"]
 
         bulk_price_cents = int(price_bulk * 100)
-        rules = {"customer_group_id": [wholesale["id"]]}
+        rules = {"customer_group_id": [self._wholesale_group_id]}
 
-        if existing_pl:
+        if self._wholesale_price_list_id:
             await self._request(
                 "POST",
-                f"/admin/price-lists/{existing_pl['id']}/prices/batch",
+                f"/admin/price-lists/{self._wholesale_price_list_id}/prices/batch",
                 json={
                     "prices": [
                         {
@@ -209,7 +220,7 @@ class MedusaSyncService:
                 }
             )
         else:
-            await self._request(
+            create_resp = await self._request(
                 "POST",
                 "/admin/price-lists",
                 json={
@@ -227,8 +238,46 @@ class MedusaSyncService:
                     ],
                 }
             )
+            self._wholesale_price_list_id = create_resp.json()["price_list"]["id"]
         logger.info(f"✅ Precio bulk ${price_bulk} sincronizado al grupo Wholesale (variant {variant_id})")
 
+    async def ensure_sales_channel(self) -> str:
+        """Verifica que exista un Sales Channel B2B y devuelve su ID. Lo crea si no existe."""
+        if self._b2b_sales_channel_id:
+            return self._b2b_sales_channel_id
+            
+        resp = await self._request("GET", "/admin/sales-channels", params={"q": "B2B"})
+        channels = resp.json().get("sales_channels", [])
+        
+        b2b = next((c for c in channels if "B2B" in c.get("name", "")), None)
+        
+        if b2b:
+            self._b2b_sales_channel_id = b2b["id"]
+        else:
+            create_resp = await self._request(
+                "POST", 
+                "/admin/sales-channels", 
+                json={"name": "VibeCloud B2B", "description": "Canal mayorista automatizado"}
+            )
+            self._b2b_sales_channel_id = create_resp.json()["sales_channel"]["id"]
+            
+        return self._b2b_sales_channel_id
+
+    async def sync_all_products(self, db: Session, tenant_id: str) -> dict:
+        """Sincroniza todos los productos de un tenant específico hacia Medusa."""
+        from database.models import Product
+        
+        stmt = select(Product).where(Product.tenant_id == tenant_id, Product.is_deleted == False)
+        products = db.exec(stmt).all()
+        
+        enqueued = 0
+        for p in products:
+            # Encolamos en lugar de hacer el sync inline para evitar timeouts
+            payload = p.model_dump() if hasattr(p, 'model_dump') else p.dict()
+            self.enqueue(db, "product", payload, error="")
+            enqueued += 1
+            
+        return {"enqueued": enqueued, "total_products": len(products)}
 
     def enqueue(self, db: Session, entity_type: str, payload: dict, error: str = "") -> None:
         item = SyncQueue(

@@ -112,7 +112,27 @@ export async function middleware(request: NextRequest) {
 
   let cacheId = cacheIdCookie?.value || crypto.randomUUID()
 
-  const regionMap = await getRegionMap(cacheId)
+  let regionMap: Map<string, HttpTypes.StoreRegion | number>
+
+  try {
+    regionMap = await getRegionMap(cacheId)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.warn(
+      `[Middleware] Medusa unreachable — using fallback region map. Error: ${message}`
+    )
+
+    // Fallback: minimal region map so the storefront still renders
+    const fallbackRegion = {
+      id: "fallback",
+      name: "Default",
+      currency_code: "usd",
+      countries: [{ iso_2: DEFAULT_REGION, display_name: "United States" }],
+    } as unknown as HttpTypes.StoreRegion
+
+    regionMap = new Map<string, HttpTypes.StoreRegion | number>()
+    regionMap.set(DEFAULT_REGION, fallbackRegion)
+  }
 
   const countryCode = regionMap && (await getCountryCode(request, regionMap))
 
