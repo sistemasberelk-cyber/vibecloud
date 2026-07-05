@@ -1,1 +1,1 @@
-export default function Home() { if (typeof window !== " undefined\) { window.location.href = \https://vibecloud-backend.onrender.com/login\; } return null; }
+export default function Home() { if (typeof window !== " undefined\) { window.location.href = \https://vibecloud-backend.onrender.com/login\; } return <div style={{height:\100vh\, display:\flex\, alignItems:\center\, justifyContent:\center\, background:\#f8fafc\, color:\#333\}}><h2>Redirigiendo al sistema...</h2></div>; }
