@@ -2,21 +2,21 @@
 
 :root {
     /* --- B2B Premium Theme (Default) --- */
-    --sidebar-bg: #111c44; /* Corporate Deep Navy */
-    --sidebar-hover: #1b254b;
-    --primary-color: #1864ab; /* Corporate Deep Blue */
-    --primary-hover: #1971c2;
-    --accent-color: #339af0; /* Light Corporate Blue */
-    --accent-hover: #4dabf7;
+    --sidebar-bg: #e0f2fe;
+    --sidebar-hover: #bae6fd;
+    --primary-color: #38bdf8;
+    --primary-hover: #0ea5e9;
+    --accent-color: #f97316;
+    --accent-hover: #ea580c;
     
-    --surface-color: #ffffff; /* White Cards */
-    --surface-alt: #f8f9fa; /* Light Gray for background */
-    --main-bg: #f4f7f6; /* Main background */
+    --surface-color: #0f172a;
+    --surface-alt: #f8fafc;
+    --main-bg: #f1f5f9;
     --border-color: #e9ecef; /* Subtle Gray Border */
     --border-strong: #dee2e6;
     
-    --text-main: #2d3748; /* Dark Slate Gray */
-    --text-muted: #718096;
+    --text-main: #0f172a;
+    --text-muted: #475569;
     --text-white: #ffffff;
     --success-color: #2f9e44;
     --warning-color: #f08c00;
@@ -41,7 +41,7 @@
 
 /* Force B2B theme across all options to ensure consistency */
 body, body.theme-midnight, body.theme-excel {
-    background-color: var(--surface-alt);
+    background-color: var(--main-bg);
     color: var(--text-main);
 }
 
@@ -56,7 +56,7 @@ body, body.theme-midnight, body.theme-excel {
 .sidebar {
     width: var(--sidebar-width);
     background: var(--sidebar-bg);
-    color: #a3b1cc;
+    color: #0f172a;
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -79,7 +79,7 @@ body, body.theme-midnight, body.theme-excel {
     align-items: center;
     gap: 12px;
     text-decoration: none;
-    color: white;
+    color: #0f172a;
 }
 
 .logo-box {
@@ -92,7 +92,7 @@ body, body.theme-midnight, body.theme-excel {
     justify-content: center;
     font-weight: 800;
     font-size: 1.1rem;
-    color: white;
+    color: #0f172a;
     box-shadow: 0 0 12px var(--accent-color);
 }
 
@@ -129,7 +129,7 @@ body, body.theme-midnight, body.theme-excel {
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    color: #a3b1cc;
+    color: #0f172a;
     text-decoration: none;
     font-weight: 500;
     font-size: 0.95rem;
@@ -144,7 +144,7 @@ body, body.theme-midnight, body.theme-excel {
 
 .sidebar-links a:hover {
     background: var(--sidebar-hover);
-    color: white;
+    color: #0f172a;
 }
 
 .sidebar-links a:hover svg {
@@ -154,7 +154,7 @@ body, body.theme-midnight, body.theme-excel {
 
 .sidebar-links a.active {
     background: var(--primary-color);
-    color: white;
+    color: #0f172a;
     font-weight: 600;
     position: relative;
 }
@@ -174,7 +174,7 @@ body, body.theme-midnight, body.theme-excel {
 
 .sidebar-links a.active svg {
     opacity: 1;
-    color: white;
+    color: #0f172a;
 }
 
 .sidebar-footer {
@@ -195,7 +195,7 @@ body, body.theme-midnight, body.theme-excel {
 .user-info .username {
     font-weight: 600;
     font-size: 0.9rem;
-    color: white;
+    color: #0f172a;
 }
 
 .user-info .role {
@@ -205,7 +205,7 @@ body, body.theme-midnight, body.theme-excel {
 }
 
 .logout-btn {
-    color: #a3b1cc;
+    color: #0f172a;
     transition: var(--transition);
 }
 
@@ -278,7 +278,7 @@ h3 { font-size: 1.25rem; }
     align-items: center;
     padding: 16px 32px;
     background: var(--primary-color);
-    color: white;
+    color: #0f172a;
     margin-bottom: 32px;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
@@ -289,7 +289,7 @@ h3 { font-size: 1.25rem; }
     align-items: center;
     gap: 12px;
     text-decoration: none;
-    color: white;
+    color: #0f172a;
     font-weight: 800;
     font-size: 1.5rem;
 }
@@ -317,7 +317,7 @@ h3 { font-size: 1.25rem; }
 
 .nav-links a:hover {
     background: rgba(255, 255, 255, 0.15);
-    color: white;
+    color: #0f172a;
 }
 
 .nav-links a.active {
@@ -331,7 +331,7 @@ h3 { font-size: 1.25rem; }
     gap: 12px;
     padding: 6px 16px;
     background: var(--primary-color);
-    color: white;
+    color: #0f172a;
     border-radius: var(--radius-full);
     font-size: 0.875rem;
     font-weight: 600;
@@ -360,7 +360,7 @@ h3 { font-size: 1.25rem; }
 
 .btn-primary {
     background: var(--primary-color);
-    color: white;
+    color: #0f172a;
 }
 
 .btn-primary:hover {
@@ -377,7 +377,7 @@ h3 { font-size: 1.25rem; }
 
 .btn-accent {
     background: var(--accent-color);
-    color: white;
+    color: #0f172a;
 }
 
 /* --- Tables --- */
@@ -739,7 +739,7 @@ label {
     min-width: 18px;
     height: 18px;
     background: var(--danger-color);
-    color: white;
+    color: #0f172a;
     font-size: 0.65rem;
     font-weight: 700;
     border-radius: 50%;
@@ -954,7 +954,7 @@ label {
         top: 50%;
         transform: translateY(-50%);
         background: var(--sidebar-bg);
-        color: white;
+        color: #0f172a;
         padding: 6px 12px;
         border-radius: var(--radius-sm);
         font-size: 0.8rem;

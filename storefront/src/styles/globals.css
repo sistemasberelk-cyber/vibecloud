@@ -9,8 +9,8 @@
    layout.tsx; the aliases below keep usage clean.
    ────────────────────────────────────────────────────────────── */
 :root {
-  --color-primary: var(--primary-sdui, #4F46E5);
-  --color-secondary: var(--secondary-sdui, #10B981);
+  --color-primary: var(--primary-sdui, #f97316);
+  --color-secondary: var(--secondary-sdui, #38bdf8);
 
   /* Derived opacity variants */
   --color-primary-10: color-mix(in srgb, var(--color-primary) 10%, transparent);
@@ -58,9 +58,9 @@
     @apply text-zinc-900 antialiased;
     background: linear-gradient(
       168deg,
-      #fafaf9 0%,
-      #f5f3ff 50%,
-      #fafaf9 100%
+      #ffffff 0%,
+      #e0f2fe 50%,
+      #ffffff 100%
     );
     selection {
       background: var(--color-primary-20);
