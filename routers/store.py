@@ -78,3 +78,28 @@ async def get_tenant_catalog(db: Session = Depends(get_session), current_user: U
     # Actually, the wizard step 3 should fetch `/api/v1/products` to show ALL products to select from.
     # This endpoint is for the public storefront to ONLY show selected products.
     return {"items": [r.dict() for r in results], "total": len(results)}
+
+
+@router.get("/public-info")
+async def get_public_store_info(db: Session = Depends(get_session)):
+    settings = db.exec(select(Settings).order_by(Settings.id)).first()
+    if not settings:
+        return {
+            "company_name": "VibeCloud",
+            "logo_url": "/static/images/berelk_logo.png",
+            "storefront_template": "elegante",
+            "ui_theme": "standard"
+        }
+    return {
+        "company_name": settings.company_name,
+        "logo_url": settings.logo_url,
+        "storefront_template": getattr(settings, "storefront_template", "elegante") or "elegante",
+        "ui_theme": settings.ui_theme
+    }
+
+
+@router.get("/public-catalog")
+async def get_public_catalog(db: Session = Depends(get_session)):
+    results = db.exec(select(Product).where(Product.is_deleted == False)).all()
+    return {"items": [r.model_dump() if hasattr(r, "model_dump") else r.dict() for r in results], "total": len(results)}
+

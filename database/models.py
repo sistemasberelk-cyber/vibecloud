@@ -89,6 +89,7 @@ class Settings(SQLModel, table=True):
 
     # FIX #1: default unificado con la migración DB (server_default='standard')
     ui_theme: str = Field(default="standard")  # standard, minimalist
+    storefront_template: str = Field(default="elegante")  # elegante, urbano, natural, tech
     is_onboarded: bool = Field(default=False)
     onboarding_step: int = Field(default=1)
 

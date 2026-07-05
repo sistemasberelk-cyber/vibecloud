@@ -410,3 +410,34 @@ sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in
 2026-06-21 17:04:30,971 [INFO] httpx: HTTP Request: PUT http://testserver/api/v1/ui-config/dashboard "HTTP/1.1 200 OK"
 2026-06-21 17:04:30,977 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/ui-config/dashboard "HTTP/1.1 200 OK"
 2026-07-03 04:28:03,602 [INFO] root: Logging system initialized.
+{"asctime": "2026-07-03 10:09:27,866", "levelname": "WARNING", "name": "__main__", "message": "SECRET_KEY env var not set. Using insecure fallback for SessionMiddleware."}
+{"asctime": "2026-07-05 13:33:59,812", "levelname": "WARNING", "name": "main", "message": "SECRET_KEY env var not set. Using insecure fallback for SessionMiddleware."}
+{"asctime": "2026-07-05 14:05:25,188", "levelname": "WARNING", "name": "main", "message": "SECRET_KEY env var not set. Using insecure fallback for SessionMiddleware."}
+{"asctime": "2026-07-05 14:05:25,745", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.schemas"}
+{"asctime": "2026-07-05 14:05:25,746", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.tables"}
+{"asctime": "2026-07-05 14:05:25,746", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.types"}
+{"asctime": "2026-07-05 14:05:25,746", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.constraints"}
+{"asctime": "2026-07-05 14:05:25,746", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.defaults"}
+{"asctime": "2026-07-05 14:05:25,746", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.comments"}
+{"asctime": "2026-07-05 14:07:06,459", "levelname": "WARNING", "name": "main", "message": "SECRET_KEY env var not set. Using insecure fallback for SessionMiddleware."}
+{"asctime": "2026-07-05 14:07:06,843", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.schemas"}
+{"asctime": "2026-07-05 14:07:06,844", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.tables"}
+{"asctime": "2026-07-05 14:07:06,844", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.types"}
+{"asctime": "2026-07-05 14:07:06,844", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.constraints"}
+{"asctime": "2026-07-05 14:07:06,844", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.defaults"}
+{"asctime": "2026-07-05 14:07:06,844", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.comments"}
+{"asctime": "2026-07-05 14:11:53,900", "levelname": "WARNING", "name": "main", "message": "SECRET_KEY env var not set. Using insecure fallback for SessionMiddleware."}
+{"asctime": "2026-07-05 14:11:54,659", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.schemas"}
+{"asctime": "2026-07-05 14:11:54,660", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.tables"}
+{"asctime": "2026-07-05 14:11:54,660", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.types"}
+{"asctime": "2026-07-05 14:11:54,661", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.constraints"}
+{"asctime": "2026-07-05 14:11:54,661", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.defaults"}
+{"asctime": "2026-07-05 14:11:54,661", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.comments"}
+{"asctime": "2026-07-05 14:16:20,281", "levelname": "WARNING", "name": "main", "message": "SECRET_KEY env var not set. Using insecure fallback for SessionMiddleware."}
+{"asctime": "2026-07-05 14:16:20,777", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.schemas"}
+{"asctime": "2026-07-05 14:16:20,778", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.tables"}
+{"asctime": "2026-07-05 14:16:20,778", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.types"}
+{"asctime": "2026-07-05 14:16:20,778", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.constraints"}
+{"asctime": "2026-07-05 14:16:20,778", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.defaults"}
+{"asctime": "2026-07-05 14:16:20,778", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.comments"}
+{"asctime": "2026-07-05 14:18:24,075", "levelname": "WARNING", "name": "main", "message": "SECRET_KEY env var not set. Using insecure fallback for SessionMiddleware."}

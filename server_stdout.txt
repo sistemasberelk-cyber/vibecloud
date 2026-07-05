@@ -1,0 +1,2 @@
+INFO: Connecting to Host: aws-1-us-east-2.pooler.supabase.com, Port: 6543, User: postgres.gfzhdtoytgoznrmysfan, DB: postgres
+INFO: Password Context Schemes: ('argon2', 'bcrypt')

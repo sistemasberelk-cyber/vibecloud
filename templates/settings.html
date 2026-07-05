@@ -38,6 +38,15 @@
                         <option value="minimalist">Minimalista (Blanco y Negro)</option>
                     </select>
                 </div>
+                <div>
+                    <label>Plantilla de Tienda Online (Storefront)</label>
+                    <select id="s-storefront-template" name="storefront_template" class="form-input" style="border: 2px solid var(--primary-color); font-weight: bold;">
+                        <option value="elegante">🩵 Elegante (Celeste, Blanco y Naranja - Default)</option>
+                        <option value="urbano">🖤 Urbano (Streetwear Oscuro y Dorado)</option>
+                        <option value="natural">🌿 Natural (Salvia, Beige y Orgánico)</option>
+                        <option value="tech">⚡ Tech (Futurista, Azul Eléctrico y Glass)</option>
+                    </select>
+                </div>
             </div>
 
 
@@ -583,6 +592,7 @@
         if (settings.label_width_mm) document.getElementById('s-label-w').value = settings.label_width_mm;
         if (settings.label_height_mm) document.getElementById('s-label-h').value = settings.label_height_mm;
         if (settings.ui_theme) document.getElementById('s-theme').value = settings.ui_theme;
+        if (settings.storefront_template) document.getElementById('s-storefront-template').value = settings.storefront_template;
         loadBackupFiles();
     });
 

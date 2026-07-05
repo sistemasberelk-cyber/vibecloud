@@ -91,6 +91,7 @@ async def update_settings(
     label_width_mm: Optional[int] = Form(None),
     label_height_mm: Optional[int] = Form(None),
     ui_theme: Optional[str] = Form(None),
+    storefront_template: Optional[str] = Form(None),
     logo_file: Optional[UploadFile] = File(None),
     session: Session = Depends(get_session),
     user: User = Depends(require_auth),
@@ -109,6 +110,7 @@ async def update_settings(
         label_height_mm=label_height_mm,
         logo_file=logo_file,
         ui_theme=ui_theme,
+        storefront_template=storefront_template,
     )
     return {"status": "success"}
 

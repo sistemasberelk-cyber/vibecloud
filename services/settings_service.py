@@ -37,6 +37,7 @@ class SettingsService:
         "label_height_mm",
         "logo_file",
         "ui_theme",
+        "storefront_template",
     }
     SUPPORTED_LOGO_CONTENT_TYPES = {"image/png", "image/jpeg", "image/webp", "image/gif", "image/svg+xml"}
 
@@ -86,6 +87,7 @@ class SettingsService:
         label_height_mm: Optional[int] = None,
         logo_file: Optional[UploadFile] = None,
         ui_theme: Optional[str] = None,
+        storefront_template: Optional[str] = None,
     ) -> Settings:
         if company_name is not None:
             normalized_company_name = company_name.strip()
@@ -137,6 +139,11 @@ class SettingsService:
             if ui_theme not in ("standard", "minimalist"):
                 raise HTTPException(status_code=400, detail="Invalid ui_theme value")
             settings.ui_theme = ui_theme
+
+        if storefront_template is not None:
+            if storefront_template not in ("elegante", "urbano", "natural", "tech"):
+                raise HTTPException(status_code=400, detail="Invalid storefront_template value")
+            settings.storefront_template = storefront_template
 
         session.add(settings)
         session.commit()

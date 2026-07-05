@@ -1,0 +1,12 @@
+{"asctime": "2026-07-05 14:11:53,900", "levelname": "WARNING", "name": "main", "message": "SECRET_KEY env var not set. Using insecure fallback for SessionMiddleware."}
+INFO:     Started server process [29524]
+INFO:     Waiting for application startup.
+{"asctime": "2026-07-05 14:11:54,659", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.schemas"}
+{"asctime": "2026-07-05 14:11:54,660", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.tables"}
+{"asctime": "2026-07-05 14:11:54,660", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.types"}
+{"asctime": "2026-07-05 14:11:54,661", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.constraints"}
+{"asctime": "2026-07-05 14:11:54,661", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.defaults"}
+{"asctime": "2026-07-05 14:11:54,661", "levelname": "INFO", "name": "alembic.runtime.plugins", "message": "setup plugin alembic.autogenerate.comments"}
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+WARNI [web.scheduler] Scheduler: Skipping tenant 1 - No Gemini API Key found.

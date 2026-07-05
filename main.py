@@ -93,6 +93,14 @@ async def lifespan(app: FastAPI):
         except Exception as e2:
             logger.error(f"Fallback create_db_and_tables also failed: {e2}")
 
+    # Ensure storefront_template column exists in settings
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("ALTER TABLE settings ADD COLUMN storefront_template VARCHAR DEFAULT 'elegante'"))
+            conn.commit()
+    except Exception:
+        pass  # Column likely already exists
+
     try:
         with Session(engine) as session:
             try:
