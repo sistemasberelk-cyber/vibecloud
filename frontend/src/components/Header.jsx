@@ -1,29 +1,23 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { predefinedCombinations, composeTheme, applyThemeToDOM } from '../lib/themes';
 
 export default function Header({ user, onLogout }) {
-  const [activeTheme, setActiveTheme] = useState('combo-1');
+  const [activeTheme, setActiveTheme] = useState(() => {
+    if (typeof window === 'undefined') return 'combo-1';
+    return localStorage.getItem('vibecloud_theme') || 'combo-1';
+  });
 
   useEffect(() => {
-    // Load theme from localStorage or user settings on mount
-    const savedTheme = localStorage.getItem('vibecloud_theme') || 'combo-1';
-    setActiveTheme(savedTheme);
-    handleThemeChange(savedTheme, false);
-  }, []);
-
-  const handleThemeChange = async (comboId, saveToBackend = true) => {
-    setActiveTheme(comboId);
-    
-    // Apply theme
-    const combo = predefinedCombinations.find(c => c.id === comboId) || predefinedCombinations[0];
+    const combo = predefinedCombinations.find(c => c.id === activeTheme) || predefinedCombinations[0];
     const composed = composeTheme(combo.palette, combo.header, combo.hero, combo.footer, combo.card);
     applyThemeToDOM(composed);
-    
-    // Save locally
+  }, [activeTheme]);
+
+  const handleThemeChange = useCallback(async (comboId, saveToBackend = true) => {
+    setActiveTheme(comboId);
     localStorage.setItem('vibecloud_theme', comboId);
 
-    // Save to backend
     if (saveToBackend && user?.tenant_id) {
       try {
         await fetch('/api/store/theme', {
@@ -35,7 +29,7 @@ export default function Header({ user, onLogout }) {
         console.error('Failed to save theme to backend', err);
       }
     }
-  };
+  }, [user?.tenant_id]);
 
   return (
     <header className="sdui-header" style={{

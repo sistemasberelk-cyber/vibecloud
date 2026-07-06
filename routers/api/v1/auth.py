@@ -154,7 +154,7 @@ def refresh(req: RefreshRequest, session: Session = Depends(get_session)):
     settings = session.exec(select(Settings).where(Settings.tenant_id == user.tenant_id)).first()
     is_onboarded = settings.is_onboarded if settings else False
 
-    return RefreshResponse(access_token=access, refresh_token=new_raw_refresh, is_onboarded=is_onboarded)
+    return RefreshResponse(access_token=access, refresh_token=raw_refresh, is_onboarded=is_onboarded)
 
 @router.post("/auth/logout")
 def logout(req: LogoutRequest, session: Session = Depends(get_session)):

@@ -161,6 +161,7 @@ app.include_router(auth_v1_router, prefix="/api/v1", tags=["Auth V1"])
 app.include_router(products_v1_router, prefix="/api/v1", tags=["Products V1"])
 app.include_router(sales_v1_router, prefix="/api/v1", tags=["Sales V1"])
 app.include_router(ui_config_v1_router, prefix="/api/v1/ui-config", tags=["UI Config V1"])
+app.include_router(ui_config_v1_router, prefix="/api/v1", tags=["UI Config V1"])
 app.include_router(inventory_v1_router, prefix="/api/v1/inventory", tags=["Inventory V1"])
 app.include_router(medusa_sync_v1_router, prefix="/api/v1", tags=["Medusa Sync V1"])
 

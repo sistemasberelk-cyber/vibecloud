@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 database/models.py — VibeCloud SaaS
 =================================
@@ -18,6 +20,7 @@ from typing import List, Optional
 from cryptography.fernet import Fernet
 from sqlalchemy import CheckConstraint, Index, UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
+from sqlalchemy.orm import relationship
 
 import os
 
@@ -67,8 +70,8 @@ class Tenant(SQLModel, table=True):
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=_utcnow)
 
-    users: List["User"] = Relationship(back_populates="tenant")
-    settings: List["Settings"] = Relationship(back_populates="tenant")
+    users: List["User"] = Relationship(sa_relationship=relationship("User", back_populates="tenant"))
+    settings: List["Settings"] = Relationship(sa_relationship=relationship("Settings", back_populates="tenant"))
 
 
 # ===========================================================================
@@ -78,7 +81,7 @@ class Tenant(SQLModel, table=True):
 class Settings(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     tenant_id: Optional[int] = Field(default=None, foreign_key="tenant.id")
-    tenant: Optional[Tenant] = Relationship(back_populates="settings")
+    tenant: Optional[Tenant] = Relationship(sa_relationship=relationship("Tenant", back_populates="settings"))
 
     company_name: str = Field(default="Berel K")
     logo_url: str = Field(default="/static/images/berelk_logo.png")
@@ -129,9 +132,9 @@ class Client(SQLModel, table=True):
     is_deleted: bool = Field(default=False)
     deleted_at: Optional[datetime] = Field(default=None)
 
-    sales: List["Sale"] = Relationship(back_populates="client")
-    payments: List["Payment"] = Relationship(back_populates="client")
-    receivables: List["AccountReceivable"] = Relationship(back_populates="client")
+    sales: List["Sale"] = Relationship(sa_relationship=relationship("Sale", back_populates="client"))
+    payments: List["Payment"] = Relationship(sa_relationship=relationship("Payment", back_populates="client"))
+    receivables: List["AccountReceivable"] = Relationship(sa_relationship=relationship("AccountReceivable", back_populates="client"))
 
 
 # ===========================================================================
@@ -141,7 +144,7 @@ class Client(SQLModel, table=True):
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     tenant_id: Optional[int] = Field(default=None, foreign_key="tenant.id")
-    tenant: Optional[Tenant] = Relationship(back_populates="users")
+    tenant: Optional[Tenant] = Relationship(sa_relationship=relationship("Tenant", back_populates="users"))
 
     username: str = Field(index=True, unique=True)
     password_hash: str
@@ -153,7 +156,7 @@ class User(SQLModel, table=True):
     is_deleted: bool = Field(default=False)
     deleted_at: Optional[datetime] = Field(default=None)
 
-    sales: List["Sale"] = Relationship(back_populates="user")
+    sales: List["Sale"] = Relationship(sa_relationship=relationship("Sale", back_populates="user"))
 
 
 # ===========================================================================
@@ -228,7 +231,7 @@ class Product(SQLModel, table=True):
     def stock_quantity(self, value: int):
         pass
 
-from sqlalchemy import Text, Index, inspect, Column
+from sqlalchemy import Text, Index, inspect, Column, JSON
 from sqlalchemy.dialects.postgresql import JSONB
 import uuid as uuid_module
 from typing import Any, Dict
@@ -244,7 +247,7 @@ class SyncQueue(SQLModel, table=True):
     entity_id: str = Field(index=True)
     payload: Dict[str, Any] = Field(
         default={},
-        sa_column=Column(JSONB)
+        sa_column=Column(JSONB().with_variant(JSON(), "sqlite"))
     )
     status: str = Field(default="pending", index=True)
     attempts: int = Field(default=0)
@@ -282,14 +285,14 @@ class Sale(SQLModel, table=True):
     is_closed: bool = Field(default=False)
 
     user_id: Optional[int] = Field(default=None, foreign_key="user.id")
-    user: Optional[User] = Relationship(back_populates="sales")
+    user: Optional[User] = Relationship(sa_relationship=relationship("User", back_populates="sales"))
 
     client_id: Optional[int] = Field(default=None, foreign_key="client.id")
-    client: Optional["Client"] = Relationship(back_populates="sales")
+    client: Optional["Client"] = Relationship(sa_relationship=relationship("Client", back_populates="sales"))
 
-    items: List["SaleItem"] = Relationship(back_populates="sale")
-    payment_allocations: List["PaymentAllocation"] = Relationship(back_populates="sale")
-    receivable: Optional["AccountReceivable"] = Relationship(back_populates="sale")
+    items: List["SaleItem"] = Relationship(sa_relationship=relationship("SaleItem", back_populates="sale"))
+    payment_allocations: List["PaymentAllocation"] = Relationship(sa_relationship=relationship("PaymentAllocation", back_populates="sale"))
+    receivable: Optional["AccountReceivable"] = Relationship(sa_relationship=relationship("AccountReceivable", back_populates="sale"))
 
     @property
     def payment_method(self) -> str:
@@ -311,7 +314,7 @@ class SaleItem(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     sale_id: Optional[int] = Field(default=None, foreign_key="sale.id")
     product_id: Optional[int] = Field(default=None, foreign_key="product.id")
-    product: Optional["Product"] = Relationship(sa_relationship_kwargs={"lazy": "joined"})
+    product: Optional["Product"] = Relationship(sa_relationship=relationship("Product", lazy="joined"))
 
     product_name: str  # snapshot
     quantity: int
@@ -319,7 +322,7 @@ class SaleItem(SQLModel, table=True):
     total: float
     cost_price_at_sale: float = Field(default=0.0)
 
-    sale: Optional[Sale] = Relationship(back_populates="items")
+    sale: Optional[Sale] = Relationship(sa_relationship=relationship("Sale", back_populates="items"))
 
 
 # ===========================================================================
@@ -336,7 +339,7 @@ class PaymentAllocation(SQLModel, table=True):
     method: str  # "cash", "transfer", "qr", "credit", "debit"
     amount: float
 
-    sale: Optional[Sale] = Relationship(back_populates="payment_allocations")
+    sale: Optional[Sale] = Relationship(sa_relationship=relationship("Sale", back_populates="payment_allocations"))
 
 
 # ===========================================================================
@@ -368,9 +371,9 @@ class AccountReceivable(SQLModel, table=True):
     due_date: Optional[datetime] = Field(default=None)
     status: str = Field(default="pending")  # pending, partial, paid, overdue
 
-    sale: Optional[Sale] = Relationship(back_populates="receivable")
-    client: Optional[Client] = Relationship(back_populates="receivables")
-    payments: List["Payment"] = Relationship(back_populates="receivable")
+    sale: Optional[Sale] = Relationship(sa_relationship=relationship("Sale", back_populates="receivable"))
+    client: Optional[Client] = Relationship(sa_relationship=relationship("Client", back_populates="receivables"))
+    payments: List["Payment"] = Relationship(sa_relationship=relationship("Payment", back_populates="receivable"))
 
 
 # ===========================================================================
@@ -394,8 +397,8 @@ class Payment(SQLModel, table=True):
     date: datetime = Field(default_factory=_utcnow)
     note: Optional[str] = None
 
-    client: Optional[Client] = Relationship(back_populates="payments")
-    receivable: Optional[AccountReceivable] = Relationship(back_populates="payments")
+    client: Optional[Client] = Relationship(sa_relationship=relationship("Client", back_populates="payments"))
+    receivable: Optional[AccountReceivable] = Relationship(sa_relationship=relationship("AccountReceivable", back_populates="payments"))
 
 
 # ===========================================================================
@@ -417,7 +420,7 @@ class Supplier(SQLModel, table=True):
     is_deleted: bool = Field(default=False)
     deleted_at: Optional[datetime] = Field(default=None)
 
-    purchases: List["Purchase"] = Relationship(back_populates="supplier")
+    purchases: List["Purchase"] = Relationship(sa_relationship=relationship("Purchase", back_populates="supplier"))
 
 
 # ===========================================================================
@@ -438,8 +441,8 @@ class Purchase(SQLModel, table=True):
     is_deleted: bool = Field(default=False)
     deleted_at: Optional[datetime] = Field(default=None)
 
-    supplier: Optional[Supplier] = Relationship(back_populates="purchases")
-    items: List["PurchaseItem"] = Relationship(back_populates="purchase")
+    supplier: Optional[Supplier] = Relationship(sa_relationship=relationship("Supplier", back_populates="purchases"))
+    items: List["PurchaseItem"] = Relationship(sa_relationship=relationship("PurchaseItem", back_populates="purchase"))
 
 
 class PurchaseItem(SQLModel, table=True):
@@ -452,7 +455,7 @@ class PurchaseItem(SQLModel, table=True):
     unit_cost: float
     total: float
 
-    purchase: Optional[Purchase] = Relationship(back_populates="items")
+    purchase: Optional[Purchase] = Relationship(sa_relationship=relationship("Purchase", back_populates="items"))
 
 
 # ===========================================================================
@@ -508,7 +511,7 @@ class Location(SQLModel, table=True):
     is_deleted: bool = Field(default=False)
     deleted_at: Optional[datetime] = Field(default=None)
 
-    bins: List["Bin"] = Relationship(back_populates="location")
+    bins: List["Bin"] = Relationship(sa_relationship=relationship("Bin", back_populates="location"))
 
 
 class Bin(SQLModel, table=True):
@@ -532,8 +535,8 @@ class Bin(SQLModel, table=True):
     is_deleted: bool = Field(default=False)
     deleted_at: Optional[datetime] = Field(default=None)
 
-    location: Optional[Location] = Relationship(back_populates="bins")
-    stock_entries: List["BinStock"] = Relationship(back_populates="bin")
+    location: Optional[Location] = Relationship(sa_relationship=relationship("Location", back_populates="bins"))
+    stock_entries: List["BinStock"] = Relationship(sa_relationship=relationship("BinStock", back_populates="bin"))
 
 
 class BinStock(SQLModel, table=True):
@@ -552,7 +555,7 @@ class BinStock(SQLModel, table=True):
     quantity: int = Field(default=0)  # >= 0 enforced por CHECK
     updated_at: datetime = Field(default_factory=_utcnow)
 
-    bin: Optional[Bin] = Relationship(back_populates="stock_entries")
+    bin: Optional[Bin] = Relationship(sa_relationship=relationship("Bin", back_populates="stock_entries"))
 
 
 class StockMovement(SQLModel, table=True):

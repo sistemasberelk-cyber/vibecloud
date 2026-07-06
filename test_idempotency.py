@@ -1,5 +1,12 @@
 import asyncio
+import os
 import httpx
+import pytest
+
+pytestmark = pytest.mark.skipif(
+    os.getenv("RUN_INTEGRATION_TESTS") != "1",
+    reason="Requires a live API server on localhost:8000",
+)
 
 async def test_webhook():
     url = "http://localhost:8000/api/v1/inventory/deduct-from-order"

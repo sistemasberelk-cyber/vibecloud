@@ -15,20 +15,17 @@ export const StoreProvider = ({ children }) => {
   });
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [cart, setCart] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-
-  // Load cart from localStorage
-  useEffect(() => {
+  const [cart, setCart] = useState(() => {
+    if (typeof window === 'undefined') return [];
     try {
       const savedCart = localStorage.getItem("vibecloud_cart");
-      if (savedCart) {
-        setCart(JSON.parse(savedCart));
-      }
+      return savedCart ? JSON.parse(savedCart) : [];
     } catch (e) {
       console.error("Error loading cart:", e);
+      return [];
     }
-  }, []);
+  });
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Save cart to localStorage
   useEffect(() => {

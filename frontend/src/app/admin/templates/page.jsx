@@ -1,20 +1,18 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { predefinedCombinations, composeTheme, applyThemeToDOM } from '@/lib/themes';
 import { apiRequest } from '@/services/api';
 
 export default function TemplatesAdmin() {
   const router = useRouter();
-  const [activeTheme, setActiveTheme] = useState('combo-1');
+  const [activeTheme, setActiveTheme] = useState(() => {
+    if (typeof window === 'undefined') return 'combo-1';
+    return localStorage.getItem('vibecloud_theme') || 'combo-1';
+  });
   const [saving, setSaving] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
   const [generating, setGenerating] = useState(false);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('vibecloud_theme') || 'combo-1';
-    setActiveTheme(savedTheme);
-  }, []);
 
   const handlePreview = (comboId) => {
     setActiveTheme(comboId);

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 export default function PaymentSection({ cartItems, onProcessSale, processing }) {
   const [paymentMethod, setPaymentMethod] = useState('cash');
@@ -19,9 +19,9 @@ export default function PaymentSection({ cartItems, onProcessSale, processing })
     return sum + (calculateItemPrice(item) * item.quantity);
   }, 0);
 
-  // Sync split fields when payment method changes or total changes
-  useEffect(() => {
-    if (paymentMethod === 'mixed') {
+  const handlePaymentMethodChange = (newMethod) => {
+    setPaymentMethod(newMethod);
+    if (newMethod === 'mixed') {
       const half = (total / 2).toFixed(2);
       setSplitCash(half);
       setSplitTransfer(half);
@@ -30,7 +30,7 @@ export default function PaymentSection({ cartItems, onProcessSale, processing })
       setSplitTransfer('');
     }
     setAmountPaid(total.toFixed(2));
-  }, [paymentMethod, total]);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -99,7 +99,7 @@ export default function PaymentSection({ cartItems, onProcessSale, processing })
           <label style={{ fontSize: '0.8rem', opacity: 0.8 }}>Método de Pago:</label>
           <select
             value={paymentMethod}
-            onChange={(e) => setPaymentMethod(e.target.value)}
+            onChange={(e) => handlePaymentMethodChange(e.target.value)}
             style={{
               background: 'var(--card-bg, rgba(0, 0, 0, 0.3))',
               border: '1px solid rgba(255, 255, 255, 0.1)',
